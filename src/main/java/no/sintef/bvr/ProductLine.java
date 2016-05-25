@@ -33,6 +33,11 @@ public class ProductLine implements Iterable<Feature> {
     public Iterator<Feature> iterator() {
         return featuresByName.values().iterator();
     }
+
+    public Feature featureAt(int index) {
+        assert index < featureCount(): String.format("Feature index should be below %d (found %d)", featureCount(), index);
+        return new Feature(index, "f%d"); 
+    }
     
     
     
