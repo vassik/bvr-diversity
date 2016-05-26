@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package no.sintef.bvr.sampler.metrics;
+package no.sintef.bvr.metrics;
 
 import static junit.framework.Assert.assertEquals;
 import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.sampler.Sample;
-import no.sintef.bvr.sampler.metrics.Coverage;
 import org.junit.Test;
 
 /**

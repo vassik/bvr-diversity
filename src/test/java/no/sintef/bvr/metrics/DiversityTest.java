@@ -1,6 +1,5 @@
-package no.sintef.bvr.sampler.metrics;
+package no.sintef.bvr.metrics;
 
-import no.sintef.bvr.sampler.metrics.Diversity;
 import static junit.framework.Assert.assertEquals;
 import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.sampler.Sample;

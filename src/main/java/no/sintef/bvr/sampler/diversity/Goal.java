@@ -1,0 +1,39 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package no.sintef.bvr.sampler.diversity;
+
+import no.sintef.bvr.metrics.Diversity;
+import no.sintef.bvr.sampler.Sample;
+
+/**
+ * The optimisation objective, including the evaluation (i.e.,
+ * fitness) of individuals.
+ */
+public class Goal {
+
+    private static final double TOLERANCE = 1e-3;
+
+    private final double desiredDiversity;
+    private final Diversity diversity;
+
+    public Goal(double diversity) {
+        this.diversity = new Diversity();
+        this.desiredDiversity = diversity;
+    }
+
+    boolean isSatisfiedBy(Sample sample) {
+        return error(sample) < TOLERANCE;
+    }
+
+    double error(Sample sample) {
+        return Math.pow(desiredDiversity - diversity.of(sample), 2);
+    }
+
+    double fitnessOf(Individual individual) {
+        return 10 * 1D / (1 + error(individual.sample()));
+    }
+
+}

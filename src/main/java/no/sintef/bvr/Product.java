@@ -26,9 +26,11 @@ public class Product {
             this.features.set(eachFeature.index(), isSelected[eachFeature.index()]);
         }
     }
-
-    public int statusOf(Feature feature) {
-        return features.get(feature.index()) ? 1 : 0;
+    
+    
+    public Product(Product source) {
+        this.productLine = source.productLine;
+        this.features = (BitSet) source.features.clone();
     }
 
     public boolean offers(Feature feature) {
@@ -41,6 +43,12 @@ public class Product {
 
     public ProductLine productLine() {
         return productLine;
+    }
+    
+    public double distanceWith(Product other) {
+        BitSet copy = (BitSet) features.clone();
+        copy.xor(other.features);
+        return copy.cardinality() / (double) productLine.featureCount();
     }
 
     @Override
@@ -81,11 +89,13 @@ public class Product {
         if (!Objects.equals(this.productLine, other.productLine)) {
             return false;
         }
-        if (!Objects.equals(this.features, other.features)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.features, other.features);
     }
+
+    public boolean belongsTo(ProductLine productLine) {
+        return this.productLine == productLine;
+    }
+   
     
     
 }

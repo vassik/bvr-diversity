@@ -16,12 +16,16 @@ import java.util.Map;
 public class ProductLine implements Iterable<Feature> {
 
     private final Map<String, Feature> featuresByName;
+    private final Map<Integer, Feature> featuresByIndex;
+    
     
     public ProductLine(int featureCount) {
         featuresByName = new HashMap<>();
+        featuresByIndex = new HashMap<>();
         for(int index=0; index<featureCount; index++) {
             final Feature newFeature = new Feature(index, "f%d");
             featuresByName.put(newFeature.name(), newFeature);
+            featuresByIndex.put(index, newFeature);
         }
     }
 
@@ -35,8 +39,7 @@ public class ProductLine implements Iterable<Feature> {
     }
 
     public Feature featureAt(int index) {
-        assert index < featureCount(): String.format("Feature index should be below %d (found %d)", featureCount(), index);
-        return new Feature(index, "f%d"); 
+        return featuresByIndex.get(index);
     }
     
     

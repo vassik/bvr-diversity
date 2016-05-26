@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package no.sintef.bvr.sampler.metrics;
+package no.sintef.bvr.metrics;
 
-import no.sintef.bvr.Feature;
 import no.sintef.bvr.Product;
 import no.sintef.bvr.sampler.Sample;
 
@@ -22,19 +21,11 @@ public class Diversity {
         for (Product product_A: sample) {
             for (Product product_B: sample) {
                 if (product_A != product_B) {
-                    sum += distance(sample, product_A, product_B);
+                    sum += product_A.distanceWith(product_B); 
                 }
             }
         }
         return sum / sample.size();
     }
-    
-    private double distance(Sample sample, Product productA, Product productB) {
-        double sum = 0;
-        for (Feature eachFeature: sample.productLine()) {
-            sum += Math.abs(productA.statusOf(eachFeature) - productB.statusOf(eachFeature));
-        }
-        return sum / sample.productLine().featureCount();
-    }
-    
+        
 }

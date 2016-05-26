@@ -6,11 +6,11 @@
 package no.sintef.bvr.sampler;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import no.sintef.bvr.Product;
 import no.sintef.bvr.ProductLine;
 
@@ -23,9 +23,16 @@ public class Sample implements Iterable<Product> {
     private final ProductLine productLine;
     private final List<Product> products;
 
-    public Sample(ProductLine productLine) {
+    public Sample(ProductLine productLine, Product... products) {
         this.productLine = productLine;
         this.products = new ArrayList<>();
+        for (Product eachGivenProduct : products) {
+            if (eachGivenProduct.belongsTo(productLine)) {
+                this.products.add(eachGivenProduct);
+            } else {
+                throw new IllegalArgumentException("Invalid product line!");
+            }
+        }
     }
 
     public void addProduct(boolean... features) {
@@ -35,6 +42,10 @@ public class Sample implements Iterable<Product> {
     public void add(Product product) {
         assert productLine == product.productLine() : "Invalid product line!";
         products.add(product);
+    }
+
+    public Product productAt(int index) {
+        return products.get(index);
     }
 
     public boolean contains(Product product) {
@@ -58,8 +69,40 @@ public class Sample implements Iterable<Product> {
         return products.size();
     }
 
-    List<Product> asList() {
-        return Collections.unmodifiableList(products);
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + Objects.hashCode(this.productLine);
+        hash = 53 * hash + Objects.hashCode(this.products);
+        return hash;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Sample other = (Sample) obj;
+        if (!Objects.equals(this.productLine, other.productLine)) {
+            return false;
+        }
+        if (!Objects.equals(new HashSet<>(this.products), new HashSet<>(other.products))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder();
+        for(Product eachProduct: products) {
+            buffer.append(eachProduct).append(System.lineSeparator());
+        }
+        return buffer.toString();
+    }
+
+    
 }
