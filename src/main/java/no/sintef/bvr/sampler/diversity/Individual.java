@@ -1,4 +1,3 @@
-
 package no.sintef.bvr.sampler.diversity;
 
 import java.util.Arrays;
@@ -22,14 +21,20 @@ public class Individual implements Comparable<Individual> {
         this.sample = sample;
         this.fitness = 0;
     }
-    
+
     Sample sample() {
         return sample;
     }
 
     void mutate() {
         if (mutationOccurs()) {
-            aRandomProduct().toggle(aRandomFeature());
+            final Product product = aRandomProduct();
+            for (int attempt=0 ;attempt<product.featureCount() ; attempt++) {
+                final Feature feature = aRandomFeature();
+                product.toggle(feature);
+                if (product.isValid()) { break; }
+                product.toggle(feature);
+            }
         }
     }
 
@@ -57,7 +62,7 @@ public class Individual implements Comparable<Individual> {
     @Override
     public int compareTo(Individual other) {
         return (int) (other.fitness - other.fitness);
-        
+
     }
 
     List<Individual> mateWith(Individual partner) {
@@ -68,14 +73,14 @@ public class Individual implements Comparable<Individual> {
         for (int index = 0; index < sample.size(); index++) {
             if (index < cutPoint) {
                 childA.add(new Product(sample.productAt(index)));
-                childB.add(new Product(partner.sample.productAt(index))); 
+                childB.add(new Product(partner.sample.productAt(index)));
             } else {
                 childA.add(new Product(partner.sample.productAt(index)));
                 childB.add(new Product(sample.productAt(index)));
             }
         }
-        
-        return Arrays.asList(new Individual[] {new Individual(childA), new Individual(childB)});
+
+        return Arrays.asList(new Individual[]{new Individual(childA), new Individual(childB)});
     }
 
 }

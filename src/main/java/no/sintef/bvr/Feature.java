@@ -48,6 +48,12 @@ public class Feature {
         }
         return Objects.equals(this.name, other.name);
     }
+
+    @Override
+    public String toString() {
+        return name + "@" + index ;
+    }
+    
     
     
 }

@@ -94,8 +94,14 @@ public class Product {
 
     public boolean belongsTo(ProductLine productLine) {
         return this.productLine == productLine;
+    }    
+
+    public boolean isValid() {
+        return productLine.isSatisfiedBy(this);
     }
-   
-    
+
+    public void set(Feature feature, boolean isSelected) {
+        features.set(feature.index(), isSelected);
+    }
     
 }

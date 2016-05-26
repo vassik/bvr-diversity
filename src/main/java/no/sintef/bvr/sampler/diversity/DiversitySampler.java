@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package no.sintef.bvr.sampler;
+package no.sintef.bvr.sampler.diversity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +14,10 @@ import no.sintef.bvr.Feature;
 import no.sintef.bvr.Product;
 import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.metrics.Diversity;
-import no.sintef.bvr.sampler.RandomSampler;
+import no.sintef.bvr.sampler.random.RandomSampler;
 import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.diversity.Goal;
 import no.sintef.bvr.sampler.diversity.Population;
