@@ -92,7 +92,7 @@ public class DiversitySamplerTest {
         productLine.addConstraint(feature(3).implies(feature(1)));
         productLine.addConstraint(feature(4).implies(feature(0)));
 
-        DiversitySampler sampler = new DiversitySampler(2, 1);
+        DiversitySampler sampler = new DiversitySampler(4, 1);
         Sample result = sampler.sample(productLine);
         
         System.out.println("Result:\n" + result);

@@ -10,10 +10,7 @@ import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.sampler.Sample;
 import org.junit.Test;
 
-/**
- *
- * @author franckc
- */
+
 public class CoverageTest {
 
     private final int featureCount;
@@ -27,20 +24,30 @@ public class CoverageTest {
     }
 
     @Test
-    public void coverageOfTheEmptyProductIsZero() {
+    public void allFeatureShouldHaveACoverageOf05() {
         Sample sample = new Sample(productLine);
         sample.addProduct(false, false, false, false, false);
 
-        assertEquals(0., coverage.of(sample));
+        assertEquals(0.5, coverage.of(sample));
     }
 
     @Test
-    public void coverageOfTheFullProductIsOne() {
+    public void noFeatureShouldHaveACoverageOf05() {
         Sample sample = new Sample(productLine);
         sample.addProduct(true, true, true, true, true);
 
-        assertEquals(1., coverage.of(sample));
+        assertEquals(0.5, coverage.of(sample));
     }
+
+        @Test
+    public void allFeatureAndNoFeatureShouldHaveACoverageOf1() {
+        Sample sample = new Sample(productLine);
+        sample.addProduct(true, true, true, true, true);
+        sample.addProduct(false, false, false, false, false);
+
+        assertEquals(1D, coverage.of(sample));
+    }
+
     
     @Test
     public void coverageOfTwoOppositeProductsShouldBeOne() {
@@ -57,7 +64,7 @@ public class CoverageTest {
         sample.addProduct(true, false, false, false, false);
         sample.addProduct(false, true, false, false, false);
 
-        assertEquals(2. / featureCount, coverage.of(sample));
+        assertEquals(7D / (2 * featureCount), coverage.of(sample));
     }
     
 }

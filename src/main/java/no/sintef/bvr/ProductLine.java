@@ -1,6 +1,8 @@
 package no.sintef.bvr;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,9 +27,24 @@ public class ProductLine implements Iterable<Feature> {
         constraints = new ArrayList<>();
     }
 
+    public ProductLine(List<String> features, List<LogicalExpression> constraints) {
+        featuresByName = new HashMap<>();
+        featuresByIndex = new HashMap<>();
+        for(int index=0; index<features.size(); index++) {
+            final Feature newFeature = new Feature(index, features.get(index));
+            featuresByName.put(newFeature.name(), newFeature);
+            featuresByIndex.put(index, newFeature);
+        }
+        this.constraints = new ArrayList<>(constraints);
+    }
+
     public int featureCount() {
         return featuresByName.size();
     } 
+    
+    public Collection<Feature> features() {
+        return Collections.unmodifiableCollection(featuresByName.values());
+    }
 
     @Override
     public Iterator<Feature> iterator() {
@@ -49,6 +66,14 @@ public class ProductLine implements Iterable<Feature> {
 
     public void addConstraint(LogicalExpression constraint) {
         this.constraints.add(constraint);
+    }
+
+    public Feature featureNamed(String name) {
+        return this.featuresByName.get(name);
+    }
+
+    public List<LogicalExpression> constraints() {
+        return Collections.unmodifiableList(constraints);
     }
    
 }

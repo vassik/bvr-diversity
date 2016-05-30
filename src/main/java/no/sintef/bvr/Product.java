@@ -6,6 +6,8 @@
 package no.sintef.bvr;
 
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -37,6 +39,10 @@ public class Product {
         return features.get(feature.index());
     }
 
+    public Collection<Feature> features() {
+        return productLine.features(); 
+    }
+    
     public int featureCount() {
         return features.cardinality();
     }

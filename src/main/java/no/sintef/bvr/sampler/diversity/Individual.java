@@ -1,8 +1,12 @@
 package no.sintef.bvr.sampler.diversity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import no.sintef.bvr.Feature;
 import no.sintef.bvr.Product;
 import no.sintef.bvr.sampler.Sample;
@@ -29,8 +33,9 @@ public class Individual implements Comparable<Individual> {
     void mutate() {
         if (mutationOccurs()) {
             final Product product = aRandomProduct();
-            for (int attempt=0 ;attempt<product.featureCount() ; attempt++) {
-                final Feature feature = aRandomFeature();
+            final List<Feature> remainingFeatures = new ArrayList<>(product.features());
+            while(!remainingFeatures.isEmpty()) {
+                final Feature feature = takeAny(remainingFeatures);
                 product.toggle(feature);
                 if (product.isValid()) { break; }
                 product.toggle(feature);
@@ -50,9 +55,11 @@ public class Individual implements Comparable<Individual> {
         return sample.productAt(index);
     }
 
-    private Feature aRandomFeature() {
-        int selected = random.nextInt(sample.productLine().featureCount());
-        return sample.productLine().featureAt(selected);
+    private Feature takeAny(List<Feature> features) {
+        assert !features.isEmpty(): "Cannot take from an empty collection";
+        if (features.size() == 1) { return features.get(0); }
+        int selected = random.nextInt(features.size());
+        return features.remove(selected);
     }
 
     void evaluate(Goal goal) {

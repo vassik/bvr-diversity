@@ -15,6 +15,11 @@ import no.sintef.bvr.sampler.Sample;
 public class Diversity {
     
     public double of(Sample sample) {
+        final int maximum = sample.size() * (sample.size()-1);
+        return absolute(sample) / maximum;
+    }
+    
+    public double absolute(Sample sample) {
         assert !sample.isEmpty(): "Invalid empty sample!";
         
         double sum = 0;
@@ -25,7 +30,7 @@ public class Diversity {
                 }
             }
         }
-        return sum / sample.size();
+        return sum;
     }
         
 }

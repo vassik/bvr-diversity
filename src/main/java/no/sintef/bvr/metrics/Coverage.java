@@ -19,14 +19,17 @@ public class Coverage {
     
     
     public double of(Sample sample) {
+        final Set<Feature> notCovered = new HashSet<>();
         final Set<Feature> covered = new HashSet<>();
         for (Product anyProduct: sample) {
             for(Feature aFeature: sample.productLine()) {
                 if (anyProduct.offers(aFeature)) {
                     covered.add(aFeature);
+                } else {
+                    notCovered.add(aFeature);
                 }
             }
         }
-        return covered.size() / (double) sample.productLine().featureCount();
+        return (covered.size() + notCovered.size()) / ((double) 2 * sample.productLine().featureCount());
     }
 } 

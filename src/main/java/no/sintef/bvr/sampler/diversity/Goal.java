@@ -5,6 +5,7 @@
  */
 package no.sintef.bvr.sampler.diversity;
 
+import no.sintef.bvr.metrics.Coverage;
 import no.sintef.bvr.metrics.Diversity;
 import no.sintef.bvr.sampler.Sample;
 
@@ -18,8 +19,10 @@ public class Goal {
 
     private final double desiredDiversity;
     private final Diversity diversity;
+    private final Coverage coverage;
 
     public Goal(double diversity) {
+        this.coverage = new Coverage();
         this.diversity = new Diversity();
         this.desiredDiversity = diversity;
     }
@@ -29,7 +32,8 @@ public class Goal {
     }
 
     double error(Sample sample) {
-        return Math.pow(desiredDiversity - diversity.of(sample), 2);
+        return Math.pow(desiredDiversity - diversity.of(sample), 2) 
+                + Math.pow(1D - coverage.of(sample), 2);
     }
 
     double fitnessOf(Individual individual) {
