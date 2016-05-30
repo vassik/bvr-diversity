@@ -16,5 +16,9 @@ public class Negation extends LogicalExpression {
         return !operand.evaluateOn(product);
     }
     
+    @Override
+    public String toString() {
+        return "not (" + operand + ")";
+    }
     
 }

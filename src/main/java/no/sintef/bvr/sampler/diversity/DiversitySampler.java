@@ -5,22 +5,10 @@
  */
 package no.sintef.bvr.sampler.diversity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import no.sintef.bvr.Feature;
-import no.sintef.bvr.Product;
 import no.sintef.bvr.ProductLine;
-import no.sintef.bvr.metrics.Diversity;
 import no.sintef.bvr.sampler.random.RandomSampler;
 import no.sintef.bvr.sampler.Sample;
-import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
-import no.sintef.bvr.sampler.Sampler;
-import no.sintef.bvr.sampler.diversity.Goal;
-import no.sintef.bvr.sampler.diversity.Population;
 
 /**
  *
@@ -28,17 +16,17 @@ import no.sintef.bvr.sampler.diversity.Population;
  */
 public class DiversitySampler implements Sampler {
 
-    public static final double DEFAULT_DIVERSITY = 0.75;
+    public static final double DEFAULT_DIVERSITY = 1;
     private static final int MAX_EPOCH = 1000;
 
     private final Goal goal;
     private final int desiredSampleSize;
 
-    DiversitySampler(int sampleSize) {
+    public DiversitySampler(int sampleSize) {
         this(sampleSize, DEFAULT_DIVERSITY);
     }
 
-    DiversitySampler(int sampleSize, double diversity) {
+    public DiversitySampler(int sampleSize, double diversity) {
         desiredSampleSize = sampleSize;
         goal = new Goal(diversity);
     }

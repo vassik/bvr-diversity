@@ -26,6 +26,10 @@ public class FeatureByName extends LogicalExpression {
         return product.offers(feature);
     }
     
+    @Override
+    public String toString() {
+        return name;
+    }
     
     
 }

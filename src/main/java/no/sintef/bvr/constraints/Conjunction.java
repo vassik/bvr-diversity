@@ -17,6 +17,12 @@ public class Conjunction extends LogicalExpression {
     protected boolean evaluateOn(Product product) {
         return leftOperand.evaluateOn(product) && rightOperand.evaluateOn(product);
     }
+
+    @Override
+    public String toString() {
+        return "(" + leftOperand + " and " + rightOperand + ")";
+    }
+    
     
     
 }

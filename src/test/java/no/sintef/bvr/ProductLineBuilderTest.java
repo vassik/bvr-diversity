@@ -9,10 +9,7 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author franckc
- */
+
 public class ProductLineBuilderTest {
     
     private final ProductLineReader read;
@@ -23,7 +20,8 @@ public class ProductLineBuilderTest {
     
     @Test
     public void readAProductLineWithConstraints() throws IOException {
-        String text = "features: F1, F2, F3\n"
+        String text = "features: \n"
+                    + "  F1, F2, F3\n"
                     + "constraints:\n"
                     + "  - F1 implies F2\n"
                     + "  - not (F1 implies (F2 or F3))\n"
@@ -33,6 +31,24 @@ public class ProductLineBuilderTest {
         
         assertEquals(3, result.featureCount());
         assertEquals(2, result.constraints().size());
+    }
+    
+    
+    @Test
+    public void readAProductLineWithMoreConstraints() throws IOException {
+        String text = "features: \n"
+                    + "  F1, F2, F3, F4, F5, F6, F7\n"
+                    + "constraints:\n"
+                    + "  - F1 implies F2\n"
+                    + "  - not (F1 implies (F2 or F3))\n"
+                    + "  - F1 implies (F5 and F6)\n"
+                    + "  - F3 or (F2 and F4)\n"
+                    ;
+        
+        ProductLine result = read.from(text); 
+        
+        assertEquals(7, result.featureCount());
+        assertEquals(4, result.constraints().size());
     }
     
 }

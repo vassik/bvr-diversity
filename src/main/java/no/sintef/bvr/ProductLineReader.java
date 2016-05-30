@@ -7,6 +7,7 @@ package no.sintef.bvr;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import no.sintef.bvr.constraints.LogicalExpression;
@@ -18,7 +19,6 @@ import static no.sintef.bvr.constraints.Builder.not;
 import no.sintef.bvr.constraints.FeatureByName;
 import no.sintef.bvr.diversity.ProductLineLexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -30,13 +30,15 @@ public class ProductLineReader {
 
     public ProductLine from(String text) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(text.getBytes());
-        
+        return from(input);
+    }
+
+    public ProductLine from(InputStream input) throws IOException {
         ProductLineLexer lexer = new ProductLineLexer(new ANTLRInputStream(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ProductLineParser parser = new ProductLineParser(tokens);
         ParseTree tree = parser.productLine();
         return tree.accept(new ProductLineBuilder());
-
     }
     
 }

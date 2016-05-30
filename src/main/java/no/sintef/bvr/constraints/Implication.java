@@ -18,5 +18,10 @@ public class Implication extends LogicalExpression {
         return !leftOperand.evaluateOn(product) || rightOperand.evaluateOn(product);
     }
     
+    @Override
+    public String toString() {
+        return "(" + leftOperand + " implies " + rightOperand + ")";
+    }
+    
     
 }
