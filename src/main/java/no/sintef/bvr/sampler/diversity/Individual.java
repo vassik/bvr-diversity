@@ -22,7 +22,6 @@ public class Individual implements Comparable<Individual> {
         this.sample = sample;
         this.fitness = 0;
     }
-
    
     Sample sample() {
         return sample;
@@ -82,13 +81,7 @@ public class Individual implements Comparable<Individual> {
 
     @Override
     public int compareTo(Individual other) {
-        if (other.fitness > fitness) {
-            return +1;
-        } else if (other.fitness == fitness) {
-            return 0;
-        } else {
-            return -1;
-        }
+        return Double.compare(other.fitness, fitness);
     }
 
     List<Individual> mateWith(Individual partner) {
