@@ -10,10 +10,6 @@ import no.sintef.bvr.sampler.random.RandomSampler;
 import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
 
-/**
- *
- * @author franckc
- */
 public class DiversitySampler implements Sampler {
 
     public static final double DEFAULT_DIVERSITY = 1;
@@ -22,25 +18,31 @@ public class DiversitySampler implements Sampler {
     private final EvolutionListener listener;
     private final Goal goal;
     private final int desiredSampleSize;
+    private final int maxEpoch;
 
     public DiversitySampler(int sampleSize) {
-        this(sampleSize, DEFAULT_DIVERSITY);
-    }
-
-    public DiversitySampler(int sampleSize, double diversity) {
-        this(sampleSize, diversity, new EvolutionListener());
+        this(sampleSize, DEFAULT_DIVERSITY, MAX_EPOCH);
     }
     
-    public DiversitySampler(int sampleSize, double diversity, EvolutionListener listener) {
+    public DiversitySampler(int sampleSize, double diversity) {
+        this(sampleSize, diversity, MAX_EPOCH);
+    }
+
+    public DiversitySampler(int sampleSize, double diversity, int maxEpoch) {
+        this(sampleSize, diversity, maxEpoch, new EvolutionListener());
+    }
+    
+    public DiversitySampler(int sampleSize, double diversity, int maxEpoch, EvolutionListener listener) {
         desiredSampleSize = sampleSize;
         goal = new Goal(diversity);
         this.listener = listener;
+        this.maxEpoch = maxEpoch;
     }
 
     @Override
     public Sample sample(ProductLine productLine) {
         final Population population = new Population(productLine, 100, new RandomSampler(desiredSampleSize), listener);
-        return population.convergeTo(goal, MAX_EPOCH);
+        return population.convergeTo(goal, maxEpoch);
     }
 
 }

@@ -49,7 +49,8 @@ public class Population {
             kill();
             breed();
             mutate();
-        }
+        } 
+        listener.complete();
         return fittest();
     }
 
