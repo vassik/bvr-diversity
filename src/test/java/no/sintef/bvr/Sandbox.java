@@ -5,9 +5,6 @@
  */
 package no.sintef.bvr;
 
-import static junit.framework.Assert.assertEquals;
-import no.sintef.bvr.sampler.Sample;
-import no.sintef.bvr.sampler.diversity.DiversitySampler;
 import org.junit.Test;
 
 /**
@@ -18,12 +15,8 @@ public class Sandbox {
 
     @Test
     public void sandbox() {
-        ProductLine productLine = new ProductLine(2);
-
-        DiversitySampler sampler = new DiversitySampler(4, 1D, 5);
-        Sample result = sampler.sample(productLine);
-
-        assertEquals(4, result.size());
+       Controller controller = new Controller();
+       controller.execute(new String[]{"sample_pl.txt", "10000"});
     }
 
 }
