@@ -6,7 +6,7 @@
 package no.sintef.bvr.sampler.diversity;
 
 import no.sintef.bvr.metrics.Coverage;
-import no.sintef.bvr.metrics.Diversity;
+import no.sintef.bvr.metrics.PairWiseDistanceError;
 import no.sintef.bvr.sampler.Sample;
 
 /**
@@ -15,15 +15,15 @@ import no.sintef.bvr.sampler.Sample;
  */
 public class Goal {
 
-    private static final double TOLERANCE = 1e-3;
+    private static final double TOLERANCE = 1e-6;
 
     private final double desiredDiversity;
-    private final Diversity diversity;
+    private final PairWiseDistanceError diversity;
     private final Coverage coverage;
 
     public Goal(double diversity) {
         this.coverage = new Coverage();
-        this.diversity = new Diversity();
+        this.diversity = new PairWiseDistanceError(diversity);
         this.desiredDiversity = diversity;
     }
 
@@ -32,7 +32,7 @@ public class Goal {
     }
 
     double error(Sample sample) {
-        return Math.pow(desiredDiversity - diversity.of(sample), 2) 
+        return Math.pow(diversity.of(sample), 2) 
                 + Math.pow(1D - coverage.of(sample), 2);
     }
 

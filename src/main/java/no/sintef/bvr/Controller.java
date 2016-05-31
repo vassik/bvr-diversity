@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.diversity.DiversitySampler;
+import no.sintef.bvr.sampler.diversity.EvolutionListener;
 
 public class Controller {
 
@@ -26,13 +27,13 @@ public class Controller {
             display.opening();
 
             InputStream inputFile = new FileInputStream(SOURCE_FILE);
-            int sampleSize = 4;
+            int sampleSize = 3;
 
             ProductLineReader read = new ProductLineReader();
             ProductLine productLine = read.from(inputFile);
             display.productLineLoaded(productLine);
 
-            Sampler sampler = new DiversitySampler(sampleSize);
+            Sampler sampler = new DiversitySampler(sampleSize, DESIRED_DIVERSITY, new EvolutionReporter(display));
             Sample result = sampler.sample(productLine);
             display.show(result);
 
@@ -40,6 +41,8 @@ public class Controller {
             display.unknownFile(SOURCE_FILE);
         }
     }
+    
+    private static final double DESIRED_DIVERSITY = 1D;
     private static final String SOURCE_FILE = "sample_pl.txt";
 
     public static void main(String arguments[]) {
@@ -47,6 +50,23 @@ public class Controller {
         controller.execute(arguments);
     }
 
+}
+
+
+class EvolutionReporter extends EvolutionListener {
+    
+    private final Console display;
+
+    public EvolutionReporter(Console display) {
+        this.display = display;
+    }
+
+    @Override
+    public void epoch(int epoch, int MAX_EPOCH, double fitness) {
+        display.progress(epoch, MAX_EPOCH, fitness);
+    }
+    
+    
 }
 
 class Console {
@@ -71,6 +91,10 @@ class Console {
 
     void show(Sample result) {
         output.println("\nResults:\n" + result);
+    }
+
+    void progress(int epoch, int MAX_EPOCH, double fitness) {
+        output.println(String.format("Epoch %d/%d ~ fitness: %.2f", epoch, MAX_EPOCH, fitness));
     }
 
 }

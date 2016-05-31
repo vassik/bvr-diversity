@@ -13,33 +13,25 @@ import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
 
-/**
- *
- * @author franckc
- */
 public class Population {
 
     private static final double BREEDING_FRACTION = 0.10;
 
     private final static Random random = new Random();
 
+    private final EvolutionListener listener;
     private final int capacity;
     private final int eliteSize;
     private final List<Individual> individuals;
 
-    public Population(ProductLine productLine, int size, Sampler sampler) {
+    public Population(ProductLine productLine, int size, Sampler sampler, EvolutionListener listener) {
         this.capacity = size;
-        this.eliteSize = (int) (capacity *  BREEDING_FRACTION);
+        this.eliteSize = (int) (capacity * BREEDING_FRACTION);
         this.individuals = new ArrayList<>();
         for (int individual = 0; individual < size; individual++) {
             individuals.add(new Individual(sampler.sample(productLine)));
         }
-    }
-
-    public void mutate() {
-        for (Individual eachIndividual : individuals) {
-            eachIndividual.mutate();
-        }
+        this.listener = listener;
     }
 
     public Sample fittest() {
@@ -50,6 +42,7 @@ public class Population {
     public Sample convergeTo(Goal goal, int MAX_EPOCH) {
         for (int epoch = 0; epoch < MAX_EPOCH; epoch++) {
             rank(goal);
+            listener.epoch(epoch, MAX_EPOCH, individuals.get(0).fitness());
             if (goal.isSatisfiedBy(fittest())) {
                 return fittest();
             }
@@ -71,10 +64,10 @@ public class Population {
         if (individuals.size() > capacity) {
             int count = individuals.size() - capacity;
             for (int index = 0; index < count; index++) {
-                individuals.remove(individuals.size()-1);
+                individuals.remove(individuals.size() - 1);
             }
         }
-        assert individuals.size() == capacity: "Population: " + individuals.size() + "(expecting: " + capacity + ")";
+        assert individuals.size() == capacity : "Population: " + individuals.size() + "(expecting: " + capacity + ")";
     }
 
     private void breed() {
@@ -94,6 +87,17 @@ public class Population {
         assert !individuals.isEmpty() : "Error: Empty population!";
         int selected = random.nextInt(individuals.size());
         return individuals.get(selected);
+    }
+
+    public void mutate() {
+        ArrayList<Individual> mutants = new ArrayList<>(individuals.size());
+        for (Individual eachIndividual : individuals) {
+            Individual mutant = eachIndividual.cloneAndMutate();
+            if (mutant != null) {
+                mutants.add(mutant);
+            }
+        }
+        individuals.addAll(mutants);
     }
 
 }

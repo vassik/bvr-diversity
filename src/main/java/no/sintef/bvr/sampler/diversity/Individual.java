@@ -2,11 +2,8 @@ package no.sintef.bvr.sampler.diversity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import no.sintef.bvr.Feature;
 import no.sintef.bvr.Product;
 import no.sintef.bvr.sampler.Sample;
@@ -26,21 +23,36 @@ public class Individual implements Comparable<Individual> {
         this.fitness = 0;
     }
 
+   
     Sample sample() {
         return sample;
     }
 
-    void mutate() {
+    boolean mutate() {
         if (mutationOccurs()) {
-            final Product product = aRandomProduct();
-            final List<Feature> remainingFeatures = new ArrayList<>(product.features());
-            while(!remainingFeatures.isEmpty()) {
-                final Feature feature = takeAny(remainingFeatures);
-                product.toggle(feature);
-                if (product.isValid()) { break; }
-                product.toggle(feature);
-            }
+            doMutate();
+            return true;
         }
+        return false;
+    }
+
+    private void doMutate() {
+        final Product product = aRandomProduct();
+        final List<Feature> remainingFeatures = new ArrayList<>(product.features());
+        while (!remainingFeatures.isEmpty()) {
+            final Feature feature = takeAny(remainingFeatures);
+            product.toggle(feature);
+            if (product.isValid()) {
+                break;
+            }
+            product.toggle(feature);
+        }
+    }
+
+    Individual cloneAndMutate() {
+        final Individual clone = new Individual(sample.duplicate());
+        boolean mutation = clone.mutate();
+        return mutation ? clone : null;
     }
 
     private boolean mutationOccurs() {
@@ -56,8 +68,10 @@ public class Individual implements Comparable<Individual> {
     }
 
     private Feature takeAny(List<Feature> features) {
-        assert !features.isEmpty(): "Cannot take from an empty collection";
-        if (features.size() == 1) { return features.get(0); }
+        assert !features.isEmpty() : "Cannot take from an empty collection";
+        if (features.size() == 1) {
+            return features.get(0);
+        }
         int selected = random.nextInt(features.size());
         return features.remove(selected);
     }
@@ -68,8 +82,13 @@ public class Individual implements Comparable<Individual> {
 
     @Override
     public int compareTo(Individual other) {
-        return (int) (other.fitness - other.fitness);
-
+        if (other.fitness > fitness) {
+            return +1;
+        } else if (other.fitness == fitness) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
     List<Individual> mateWith(Individual partner) {
@@ -88,6 +107,10 @@ public class Individual implements Comparable<Individual> {
         }
 
         return Arrays.asList(new Individual[]{new Individual(childA), new Individual(childB)});
+    }
+
+    public double fitness() {
+        return this.fitness;
     }
 
 }

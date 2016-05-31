@@ -22,10 +22,10 @@ public class DiversitySamplerTest {
     public void shouldYieldTheCorrectNumberOfProducts() {
         ProductLine productLine = new ProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(5);
+        DiversitySampler sampler = new DiversitySampler(4);
         Sample result = sampler.sample(productLine);
 
-        assertEquals(5, result.size());
+        assertEquals(4, result.size());
     }
 
     @Test

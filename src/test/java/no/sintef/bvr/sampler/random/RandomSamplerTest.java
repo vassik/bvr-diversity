@@ -16,54 +16,12 @@ import org.junit.Test;
 
 
 
-
-class HackedRandomSampler extends RandomSampler {
-
-    private boolean selected;
-            
-    public HackedRandomSampler(int sampleSize, boolean isSelected) {
-        super(sampleSize);
-        selected = isSelected;
-    }
-
-    @Override
-    protected boolean randomFeature() {
-        return selected;
-    }
-    
-}
-
 public class RandomSamplerTest {
 
     private final ProductLine productLine;
 
     public RandomSamplerTest() {
         productLine = new ProductLine(5);
-    }
-    
-    
-    @Test
-    public void testAlwaysFalse() {
-        Sampler sampler = new HackedRandomSampler(5, false);
-        
-        Sample sample = sampler.sample(productLine);
-        
-        for(Product eachProduct: sample) {
-            assertEquals(0, eachProduct.featureCount()); 
-        }
-                    
-    }
-    
-    @Test
-    public void testAlwaysTrue() {
-        Sampler sampler = new HackedRandomSampler(5, true);
-        
-        Sample sample = sampler.sample(productLine);
-        
-        for(Product eachProduct: sample) {
-            assertEquals(5, eachProduct.featureCount()); 
-        }
-                    
     }
     
     @Test

@@ -6,6 +6,7 @@
 package no.sintef.bvr.sampler.random;
 
 import java.util.Iterator;
+import java.util.Random;
 import no.sintef.bvr.Feature;
 import no.sintef.bvr.Product;
 import no.sintef.bvr.ProductLine;
@@ -39,16 +40,20 @@ class FeatureGenerator extends Generator {
 
     private static final int OPTIONS = 2;
 
+    private final Random random;
     private final Generator delegate;
     private final Feature feature;
+    private Boolean value;
     private int alternatives;
 
     public FeatureGenerator(Generator delegate, Product product, Feature feature) {
         super(product);
+        this.random = new Random();
         this.delegate = delegate;
         this.feature = feature;
         this.alternatives = OPTIONS;
-        product.set(feature, alternatives == OPTIONS);
+        this.value = random.nextBoolean();
+        product.set(feature, value);
     }
 
     @Override
@@ -70,14 +75,14 @@ class FeatureGenerator extends Generator {
 
     private void setUp() {
         alternatives--;
-        product.set(feature, alternatives == OPTIONS);
+        product.set(feature, !value);
         delegate.reset();
     }
 
     @Override
     public void reset() {
         alternatives = OPTIONS;
-        product.set(feature, alternatives == OPTIONS);
+        product.set(feature, value);
         delegate.reset();
     }
 

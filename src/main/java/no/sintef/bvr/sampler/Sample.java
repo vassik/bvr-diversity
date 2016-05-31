@@ -34,6 +34,14 @@ public class Sample implements Iterable<Product> {
         }
     }
 
+    public Sample duplicate() {
+        final Product[] productsCopy = new Product[products.size()];
+        for (int index=0 ; index<products.size() ; index++) {
+            productsCopy[index] = new Product(products.get(index));
+        }
+        return new Sample(productLine, productsCopy);
+    }
+
     public void addProduct(boolean... features) {
         products.add(new Product(productLine, features));
     }
