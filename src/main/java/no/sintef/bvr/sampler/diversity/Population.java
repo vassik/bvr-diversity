@@ -13,6 +13,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
@@ -29,7 +31,7 @@ public class Population {
     private final int capacity;
     private final int eliteSize;
     private final List<Individual> individuals;
-    
+
     public Population(ProductLine productLine, int size, Sampler sampler, EvolutionListener listener) {
         this.executor = Executors.newFixedThreadPool(WORKER_COUNT);
         this.capacity = size;
@@ -66,14 +68,14 @@ public class Population {
         executor.shutdown();
         try {
             executor.awaitTermination(1L, TimeUnit.SECONDS);
-        
+
         } catch (InterruptedException ex) {
             throw new RuntimeException(ex);
         }
     }
 
     private void rank(final Goal goal) {
-       final CountDownLatch latch = new CountDownLatch(individuals.size());
+        final CountDownLatch latch = new CountDownLatch(individuals.size());
         for (final Individual eachIndividual : individuals) {
             executor.execute(new Runnable() {
                 @Override
@@ -83,14 +85,18 @@ public class Population {
                 }
             });
         }
+        waitAllAt(latch);
+        Collections.sort(individuals);
+    }
+
+    private void waitAllAt(final CountDownLatch latch) throws RuntimeException {
         try {
             latch.await(1, TimeUnit.SECONDS);
-       
+
         } catch (InterruptedException ex) {
-           throw new RuntimeException(ex);
-        
+            throw new RuntimeException(ex);
+
         }
-        Collections.sort(individuals);
     }
 
     private void kill() {
@@ -123,13 +129,23 @@ public class Population {
     }
 
     public void mutate() {
-        ArrayList<Individual> mutants = new ArrayList<>(individuals.size());
-        for (Individual eachIndividual : individuals) {
-            Individual mutant = eachIndividual.cloneAndMutate();
-            if (mutant != null) {
-                mutants.add(mutant);
-            }
+        final CountDownLatch latch = new CountDownLatch(individuals.size());
+        final ArrayList<Individual> mutants = new ArrayList<>(individuals.size());
+        for (final Individual eachIndividual : individuals) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Individual mutant = eachIndividual.cloneAndMutate();
+                    if (mutant != null) {
+                        synchronized (mutants) {
+                            mutants.add(mutant);
+                        }
+                    }
+                    latch.countDown();
+                }
+            });
         }
+        waitAllAt(latch);
         individuals.addAll(mutants);
     }
 
