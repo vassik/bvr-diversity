@@ -7,22 +7,22 @@ package no.sintef.bvr;
 
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
- *
- * @author franckc
+ * A product instance of a given product line (i.e., a "resolution" in BVR parlance)
  */
 public class Product {
 
     private final ProductLine productLine;
+    private final int featureCount; // cached for Performance
     private final BitSet features;
 
     public Product(ProductLine productLine, boolean... isSelected) {
         assert isSelected.length == productLine.featureCount() : "Invalid feature count!";
 
         this.productLine = productLine;
+        this.featureCount = productLine.featureCount();
         this.features = new BitSet(productLine.featureCount());
         for (Feature eachFeature : productLine) {
             this.features.set(eachFeature.index(), isSelected[eachFeature.index()]);
@@ -32,6 +32,7 @@ public class Product {
     
     public Product(Product source) {
         this.productLine = source.productLine;
+        this.featureCount = source.featureCount;
         this.features = (BitSet) source.features.clone();
     }
 
@@ -43,7 +44,7 @@ public class Product {
         return productLine.features(); 
     }
     
-    public int featureCount() {
+    public int activefeatureCount() {
         return features.cardinality();
     }
 
@@ -54,7 +55,7 @@ public class Product {
     public double distanceWith(Product other) {
         BitSet copy = (BitSet) features.clone();
         copy.xor(other.features);
-        return copy.cardinality() / (double) productLine.featureCount();
+        return copy.cardinality() / (double) featureCount;
     }
 
     @Override
