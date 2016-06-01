@@ -14,12 +14,12 @@ import no.sintef.bvr.sampler.Sample;
  */
 public class PairWiseDistanceError {
 
-    private final double desiredDiversity;
+    private final double desiredDistance;
 
     public PairWiseDistanceError(double desiredDiversity) {
-        this.desiredDiversity = desiredDiversity;
+        this.desiredDistance = desiredDiversity;
     }
-    
+
     public double of(Sample sample) {
         return Math.sqrt(absolute(sample));
     }
@@ -28,13 +28,19 @@ public class PairWiseDistanceError {
         assert !sample.isEmpty() : "Invalid empty sample!";
 
         double sum = 0;
-        for (Product product_A : sample) {
-            for (Product product_B : sample) {
-                if (product_A != product_B) {
-                    sum += Math.pow(desiredDiversity - product_A.distanceWith(product_B), 2);
-                }
+        for (int i = 0; i < sample.size(); i++) {
+            for (int j = i + 1; j < sample.size(); j++) {
+                final double distance = sample.productAt(i).distanceWith(sample.productAt(j));
+                sum += Math.pow(desiredDistance - distance, 2);
             }
         }
+//        for (Product product_A : sample) {
+//            for (Product product_B : sample) {
+//                if (product_A != product_B) {
+//                    sum += Math.pow(desiredDistance - product_A.distanceWith(product_B), 2);
+//                }
+//            }
+//        }
         return sum;
     }
 

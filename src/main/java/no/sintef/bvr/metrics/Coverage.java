@@ -34,7 +34,7 @@ public class Coverage {
 //        return (covered.size() + notCovered.size()) / ((double) 2 * sample.productLine().featureCount());
 //    }
     
-    public double of(Sample sample) {
+    public double of2(Sample sample) {
         final int featureCount = sample.productLine().featureCount();
         final BitSet notCovered = new BitSet(featureCount);
         final BitSet covered = new BitSet(featureCount);
@@ -46,6 +46,19 @@ public class Coverage {
                     notCovered.set(aFeature.index());
                 }
             }
+        }
+        return (covered.cardinality() + notCovered.cardinality()) / ((double) 2 * featureCount);
+    }
+    
+    public double of(Sample sample) {
+        final int featureCount = sample.productLine().featureCount();
+        final BitSet covered = new BitSet(featureCount);
+        final BitSet notCovered = new BitSet(featureCount);
+        for (Product anyProduct: sample) {
+            final BitSet offered = (BitSet) anyProduct.asBitSet().clone();
+            covered.or(offered); 
+            offered.flip(0, featureCount);
+            notCovered.or(offered);
         }
         return (covered.cardinality() + notCovered.cardinality()) / ((double) 2 * featureCount);
     }

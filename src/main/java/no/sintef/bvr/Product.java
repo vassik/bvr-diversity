@@ -109,5 +109,9 @@ public class Product {
     public void set(Feature feature, boolean isSelected) {
         features.set(feature.index(), isSelected);
     }
+
+    public BitSet asBitSet() {
+        return this.features;
+    }
     
 }
