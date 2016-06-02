@@ -23,13 +23,13 @@ import no.sintef.bvr.sampler.Sampler;
 
 public class Population {
 
-    //private static final int WORKER_COUNT = Runtime.getRuntime().availableProcessors() - 2;
-    private static final int WORKER_COUNT = 4;
+    private static final int WORKER_COUNT = Runtime.getRuntime().availableProcessors();
     private static final double BREEDING_FRACTION = 0.10;
 
     private final static Random random = new Random();
 
     private final ExecutorService executor;
+    private final CompletionService<List<Individual>> tasks;
     private final EvolutionListener listener;
     private final int capacity;
     private final int eliteSize;
@@ -40,7 +40,7 @@ public class Population {
         this.tasks = new ExecutorCompletionService<>(executor);
         this.capacity = size;
         this.eliteSize = (int) (capacity * BREEDING_FRACTION);
-        this.individuals = new ArrayList<>();
+        this.individuals = new ArrayList<>(capacity + 2 * eliteSize);
         for (int individual = 0; individual < size; individual++) {
             individuals.add(new Individual(sampler.sample(productLine)));
         }
@@ -67,8 +67,6 @@ public class Population {
         wrapUp();
         return fittest();
     }
-
-    private final CompletionService<List<Individual>> tasks;
 
     private void startBuidlingNextGeneration(CompletionService<List<Individual>> tasks, final Goal goal) {
         for (int index = 0; index < eliteSize; index++) {
