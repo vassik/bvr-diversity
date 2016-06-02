@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +37,7 @@ public class Population {
 
     public Population(ProductLine productLine, int size, Sampler sampler, EvolutionListener listener) {
         this.executor = Executors.newFixedThreadPool(WORKER_COUNT);
+        this.tasks = new ExecutorCompletionService<>(executor);
         this.capacity = size;
         this.eliteSize = (int) (capacity * BREEDING_FRACTION);
         this.individuals = new ArrayList<>();
@@ -49,18 +53,55 @@ public class Population {
     }
 
     public Sample convergeTo(final Goal goal, int MAX_EPOCH) {
+        rank(goal);
         for (int epoch = 0; epoch < MAX_EPOCH; epoch++) {
-            rank(goal);
             listener.epoch(epoch, MAX_EPOCH, individuals.get(0).fitness());
             if (goal.isSatisfiedBy(fittest())) {
                 break;
             }
+            startBuidlingNextGeneration(tasks, goal);
+            collectNextGeneration(tasks);
+            Collections.sort(individuals);
             kill();
-            breed();
-            mutate();
         }
         wrapUp();
         return fittest();
+    }
+
+    private final CompletionService<List<Individual>> tasks;
+
+    private void startBuidlingNextGeneration(CompletionService<List<Individual>> tasks, final Goal goal) {
+        for (int index = 0; index < eliteSize; index++) {
+            final Individual indidviual = individuals.get(index);
+            final Individual partner = selectAnyFrom(individuals);
+            tasks.submit(new Callable<List<Individual>>() {
+                @Override
+                public List<Individual> call() throws Exception {
+                    return evolve(indidviual, partner, goal);
+                }
+            });
+        }
+    }
+
+    private Individual selectAnyFrom(List<Individual> candidates) {
+        assert !candidates.isEmpty() : "Error: Empty population!";
+        if (candidates.size() == 1) {
+            return candidates.get(0);
+        }
+        int selected = random.nextInt(candidates.size());
+        return candidates.get(selected);
+    }
+
+    private void collectNextGeneration(CompletionService<List<Individual>> tasks) throws RuntimeException {
+        for (int index = 0; index < eliteSize; index++) {
+            try {
+                List<Individual> children = tasks.take().get();
+                individuals.addAll(children);
+
+            } catch (InterruptedException | ExecutionException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     private void wrapUp() throws RuntimeException {
@@ -73,7 +114,16 @@ public class Population {
             throw new RuntimeException(ex);
         }
     }
-    
+
+    public List<Individual> evolve(Individual individual, Individual partner, Goal goal) {
+        final List<Individual> children = individual.mateWith(partner);
+        for (Individual eachChild : children) {
+            eachChild.mutate();
+            eachChild.evaluate(goal);
+        }
+        return children;
+    }
+
     private void rank(final Goal goal) {
         final CountDownLatch latch = new CountDownLatch(individuals.size());
         for (final Individual eachIndividual : individuals) {
@@ -107,56 +157,6 @@ public class Population {
             }
         }
         assert individuals.size() == capacity : "Population: " + individuals.size() + "(expecting: " + capacity + ")";
-    }
-
-    private void breed() {
-        //final CountDownLatch latch = new CountDownLatch(eliteSize);
-        //final ConcurrentLinkedQueue<Individual> allChildren = new ConcurrentLinkedQueue<>();
-        final List<Individual> allChildren = new ArrayList<>(eliteSize * 2);
-        final List<Individual> remainingParents = new ArrayList<>(individuals);
-        for (final Individual eachIndividual : elite()) {
-            final Individual partner = takeAnyFrom(remainingParents);
-//            executor.execute(new Runnable() {
-//                @Override
-//                public void run() {
-            final List<Individual> children = eachIndividual.mateWith(partner);
-            allChildren.addAll(children); 
-//                    latch.countDown();
-//                }
-//
-//            });
-        }
-//        waitAllAt(latch);
-        individuals.addAll(allChildren);
-    }
-
-    private Iterable<Individual> elite() {
-        return individuals.subList(0, eliteSize);
-    }
-
-    private Individual takeAnyFrom(List<Individual> candidates) {
-        assert !candidates.isEmpty() : "Error: Empty population!";
-        int selected = random.nextInt(candidates.size());
-        return candidates.remove(selected);
-    }
-
-    public void mutate() {
-        final CountDownLatch latch = new CountDownLatch(individuals.size());
-        final ConcurrentLinkedQueue<Individual> mutants = new ConcurrentLinkedQueue<>();
-        for (final Individual eachIndividual : individuals) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Individual mutant = eachIndividual.cloneAndMutate();
-                    if (mutant != null) {
-                        mutants.add(mutant);
-                    }
-                    latch.countDown();
-                }
-            });
-        }
-        waitAllAt(latch);
-        individuals.addAll(mutants);
     }
 
 }

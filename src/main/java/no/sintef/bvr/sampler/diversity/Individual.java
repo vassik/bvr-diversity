@@ -35,6 +35,13 @@ public class Individual implements Comparable<Individual> {
         return false;
     }
 
+    private boolean mutationOccurs() {
+        double draw = random.nextDouble();
+        return draw < MUTATION_PROBABILITY;
+    }
+
+    private static final double MUTATION_PROBABILITY = 0.25;
+
     private void doMutate() {
         final Product product = aRandomProduct();
         final List<Feature> remainingFeatures = new ArrayList<>(product.features());
@@ -47,19 +54,6 @@ public class Individual implements Comparable<Individual> {
             product.toggle(feature);
         }
     }
-
-    Individual cloneAndMutate() {
-        final Individual clone = new Individual(sample.duplicate());
-        boolean mutation = clone.mutate();
-        return mutation ? clone : null;
-    }
-
-    private boolean mutationOccurs() {
-        double draw = random.nextDouble();
-        return draw < MUTATION_PROBABILITY;
-    }
-
-    private static final double MUTATION_PROBABILITY = 0.25;
 
     private Product aRandomProduct() {
         int index = random.nextInt(sample.size());
