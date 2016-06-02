@@ -1,12 +1,17 @@
 package no.sintef.bvr;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import no.sintef.bvr.metrics.Coverage;
+import no.sintef.bvr.metrics.DistanceMatrix;
+import no.sintef.bvr.metrics.Diversity;
 import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.diversity.DiversitySampler;
@@ -45,12 +50,24 @@ public class Controller {
 
             Sampler sampler = new DiversitySampler(sampleSize, DESIRED_DIVERSITY, maxEpoch, new SingleThreadedEvolutionReporter(display));
             Sample result = sampler.sample(productLine);
-            display.show(result);
+
+            Diversity diversity = new Diversity();
+            Coverage coverage = new Coverage();
+            display.show(result, coverage.of(result), diversity.of(result));
+
+            storeDistanceMatrix(result);
 
         } catch (IOException ex) {
             display.unknownFile(SOURCE_FILE);
 
         }
+    }
+
+    private void storeDistanceMatrix(Sample result) throws FileNotFoundException {
+        DistanceMatrix distanceMatrix = new DistanceMatrix();
+        double[][] matrix = distanceMatrix.of(result);
+        CsvDistanceMatrixFormatter csv = new CsvDistanceMatrixFormatter(new FileOutputStream("distance_matrix.csv"));
+        csv.write(matrix);
     }
 
     private static final double DESIRED_DIVERSITY = 1D;
@@ -64,19 +81,18 @@ public class Controller {
 }
 
 class SingleThreadedEvolutionReporter extends EvolutionListener {
-    
-    
+
     private final Console display;
 
     public SingleThreadedEvolutionReporter(Console display) {
         this.display = display;
     }
-    
+
     @Override
     public void epoch(int epoch, int MAX_EPOCH, double fitness) {
         display.progress(epoch, MAX_EPOCH, fitness);
     }
-    
+
 }
 
 class MultiThreadEvolutionReporter extends EvolutionListener {
@@ -85,7 +101,7 @@ class MultiThreadEvolutionReporter extends EvolutionListener {
     private final BlockingQueue<Runnable> tasks;
     private final Processor processor;
     private final Thread thread;
-    
+
     public MultiThreadEvolutionReporter(Console display) {
         this.display = display;
         this.tasks = new ArrayBlockingQueue<>(1000);
@@ -114,15 +130,13 @@ class MultiThreadEvolutionReporter extends EvolutionListener {
                 processor.stop();
                 try {
                     thread.join(5000L);
-                
+
                 } catch (InterruptedException ex) {
                     // TODO do something
                 }
             }
         });
     }
-    
-    
 
     static class Processor implements Runnable {
 
@@ -133,21 +147,23 @@ class MultiThreadEvolutionReporter extends EvolutionListener {
             this.tasks = tasks;
             this.stopped = false;
         }
-             
+
         public void stop() {
             this.stopped = true;
         }
-        
+
         @Override
         public void run() {
             while (true) {
                 try {
                     Runnable nextTask = tasks.take();
                     nextTask.run();
-                    if (stopped) break;
-                    
+                    if (stopped) {
+                        break;
+                    }
+
                 } catch (InterruptedException ex) {
-                    
+
                 }
             }
         }
@@ -183,8 +199,36 @@ class Console {
         show(PRODUCT_LINE_OVERVIEW, productLine.featureCount(), productLine.constraints().size());
     }
 
-    void show(Sample result) {
-        show(RESULTS + result);
+    void show(Sample sample, double coverage, double diversity) {
+        show("\nResults (Cov=%.3f %%; FAD=%.3f):\n", coverage, diversity);
+        showTableHeader(sample);
+        showTableBody(sample);
+    }
+
+    private void showTableHeader(Sample sample) {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(String.format(TABLE_COLUMN_WIDTH, "P/F"));
+        for (Feature eachFeature : sample.productLine().features()) {
+            buffer.append(String.format(TABLE_COLUMN_WIDTH, eachFeature.name()));
+        }
+        buffer.append("\n");
+        show(buffer.toString());
+    }
+    private static final String TABLE_COLUMN_WIDTH = "%4s ";
+
+    private void showTableBody(Sample sample) {
+        for (int index = 0; index < sample.size(); index++) {
+            show(" P%02d", index);
+            for (Feature eachFeature : sample.productLine()) {
+                Product eachProduct = sample.productAt(index);
+                if (eachProduct.offers(eachFeature)) {
+                    show(TABLE_COLUMN_WIDTH, "X");
+                } else {
+                    show(TABLE_COLUMN_WIDTH, "~");
+                }
+            }
+            show("\n");
+        }
     }
 
     void progress(int epoch, int MAX_EPOCH, double fitness) {

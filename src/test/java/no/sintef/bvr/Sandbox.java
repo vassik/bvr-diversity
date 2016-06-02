@@ -14,4 +14,9 @@ public class Sandbox {
        controller.execute(new String[]{"sample_pl.txt", "10000"});
     }
 
+    
+    @Test
+    public void miniSandbox() {
+        System.out.printf("%8.2e", 0D);
+    }
 }
