@@ -43,7 +43,7 @@ public class Controller {
             ProductLine productLine = read.from(inputFile);
             display.productLineLoaded(productLine);
 
-            Sampler sampler = new DiversitySampler(sampleSize, DESIRED_DIVERSITY, maxEpoch, new MonoThreadEvolutionReporter(display));
+            Sampler sampler = new DiversitySampler(sampleSize, DESIRED_DIVERSITY, maxEpoch, new SingleThreadedEvolutionReporter(display));
             Sample result = sampler.sample(productLine);
             display.show(result);
 
@@ -63,12 +63,12 @@ public class Controller {
 
 }
 
-class MonoThreadEvolutionReporter extends EvolutionListener {
+class SingleThreadedEvolutionReporter extends EvolutionListener {
     
     
     private final Console display;
 
-    public MonoThreadEvolutionReporter(Console display) {
+    public SingleThreadedEvolutionReporter(Console display) {
         this.display = display;
     }
     

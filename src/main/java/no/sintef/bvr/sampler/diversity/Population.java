@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import no.sintef.bvr.ProductLine;
 import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
 
 public class Population {
 
-    private static final int WORKER_COUNT = Runtime.getRuntime().availableProcessors() - 1;
+    //private static final int WORKER_COUNT = Runtime.getRuntime().availableProcessors() - 2;
+    private static final int WORKER_COUNT = 4;
     private static final double BREEDING_FRACTION = 0.10;
 
     private final static Random random = new Random();
@@ -53,7 +53,7 @@ public class Population {
             rank(goal);
             listener.epoch(epoch, MAX_EPOCH, individuals.get(0).fitness());
             if (goal.isSatisfiedBy(fittest())) {
-                return fittest();
+                break;
             }
             kill();
             breed();
@@ -73,7 +73,7 @@ public class Population {
             throw new RuntimeException(ex);
         }
     }
-
+    
     private void rank(final Goal goal) {
         final CountDownLatch latch = new CountDownLatch(individuals.size());
         for (final Individual eachIndividual : individuals) {
@@ -110,11 +110,23 @@ public class Population {
     }
 
     private void breed() {
-        final List<Individual> allChildren = new ArrayList<>(2 * eliteSize);
-        for (Individual eachIndividual : elite()) {
-            List<Individual> children = eachIndividual.mateWith(aRandomIndividual());
-            allChildren.addAll(children);
+        //final CountDownLatch latch = new CountDownLatch(eliteSize);
+        //final ConcurrentLinkedQueue<Individual> allChildren = new ConcurrentLinkedQueue<>();
+        final List<Individual> allChildren = new ArrayList<>(eliteSize * 2);
+        final List<Individual> remainingParents = new ArrayList<>(individuals);
+        for (final Individual eachIndividual : elite()) {
+            final Individual partner = takeAnyFrom(remainingParents);
+//            executor.execute(new Runnable() {
+//                @Override
+//                public void run() {
+            final List<Individual> children = eachIndividual.mateWith(partner);
+            allChildren.addAll(children); 
+//                    latch.countDown();
+//                }
+//
+//            });
         }
+//        waitAllAt(latch);
         individuals.addAll(allChildren);
     }
 
@@ -122,24 +134,22 @@ public class Population {
         return individuals.subList(0, eliteSize);
     }
 
-    private Individual aRandomIndividual() {
-        assert !individuals.isEmpty() : "Error: Empty population!";
-        int selected = random.nextInt(individuals.size());
-        return individuals.get(selected);
+    private Individual takeAnyFrom(List<Individual> candidates) {
+        assert !candidates.isEmpty() : "Error: Empty population!";
+        int selected = random.nextInt(candidates.size());
+        return candidates.remove(selected);
     }
 
     public void mutate() {
         final CountDownLatch latch = new CountDownLatch(individuals.size());
-        final ArrayList<Individual> mutants = new ArrayList<>(individuals.size());
+        final ConcurrentLinkedQueue<Individual> mutants = new ConcurrentLinkedQueue<>();
         for (final Individual eachIndividual : individuals) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     Individual mutant = eachIndividual.cloneAndMutate();
                     if (mutant != null) {
-                        synchronized (mutants) {
-                            mutants.add(mutant);
-                        }
+                        mutants.add(mutant);
                     }
                     latch.countDown();
                 }

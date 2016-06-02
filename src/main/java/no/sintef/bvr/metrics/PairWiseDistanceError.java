@@ -5,6 +5,7 @@
  */
 package no.sintef.bvr.metrics;
 
+import no.sintef.bvr.Product;
 import no.sintef.bvr.sampler.Sample;
 
 /**
@@ -29,9 +30,11 @@ public class PairWiseDistanceError {
         double sum = 0;
         final int productCount = sample.size();
         for (int i = 0; i < productCount; i++) {
+            final Product product_i = sample.productAt(i);
             for (int j = i + 1; j < productCount; j++) {
-                final double distance = sample.productAt(i).distanceWith(sample.productAt(j));
-                sum += Math.pow(desiredDistance-distance, 2);
+                final double distance = product_i.distanceWith(sample.productAt(j));
+                final double error = desiredDistance - distance;
+                sum += error * error;
             }
         }
         return sum;
