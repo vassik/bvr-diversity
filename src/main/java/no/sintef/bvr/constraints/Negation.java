@@ -18,7 +18,7 @@ public class Negation extends LogicalExpression {
     
     @Override
     public String toString() {
-        return "not (" + operand + ")";
+        return "(not " + operand + ")";
     }
     
 }

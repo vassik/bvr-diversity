@@ -11,7 +11,7 @@ public class Sandbox {
     @Test
     public void sandbox() {
        Controller controller = new Controller();
-       controller.execute(new String[]{"sample_pl.txt", "10000"});
+       controller.execute(new String[]{"gen_pl_20.txt", "5", "10000"});
     }
 
     

@@ -35,14 +35,15 @@ public class Controller {
 
             String pathToProductLine = SOURCE_FILE;
             int maxEpoch = 10000;
+            int sampleSize = 3;
 
-            if (arguments.length == 2) {
+            if (arguments.length == 3) {
                 pathToProductLine = arguments[0];
-                maxEpoch = Integer.parseInt(arguments[1]);
+                sampleSize = Integer.parseInt(arguments[1]);
+                maxEpoch = Integer.parseInt(arguments[2]);
             }
 
             InputStream inputFile = new FileInputStream(pathToProductLine);
-            int sampleSize = 3;
 
             ProductLineReader read = new ProductLineReader();
             ProductLine productLine = read.from(inputFile);
@@ -177,7 +178,6 @@ class Console {
     public static final String TOOL_NAME = "BVR Diversity Sampler -- %s\n";
     public static final String ERROR__UNKNOWN_FILE = "Error: Unable to load file '%s'";
     public static final String PRODUCT_LINE_OVERVIEW = "Product line (%d features ; %d constraints)\n";
-    public static final String RESULTS = "\nResults:\n";
     public static final String PROGRESS = "\rEpoch %d/%d ~ fitness: %.2f";
 
     private final PrintStream output;
@@ -214,6 +214,7 @@ class Console {
         buffer.append("\n");
         show(buffer.toString());
     }
+
     private static final String TABLE_COLUMN_WIDTH = "%4s ";
 
     private void showTableBody(Sample sample) {
