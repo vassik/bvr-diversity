@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package no.sintef.bvr.metrics;
 
 import no.sintef.bvr.Product;
@@ -10,7 +6,6 @@ import no.sintef.bvr.sampler.Sample;
 
 /**
  *
- * @author franckc
  */
 public class PairWiseDistanceError {
 
@@ -21,7 +16,7 @@ public class PairWiseDistanceError {
     }
 
     public double of(Sample sample) {
-        return Math.sqrt(absolute(sample));
+        return absolute(sample);
     }
 
     public double absolute(Sample sample) {

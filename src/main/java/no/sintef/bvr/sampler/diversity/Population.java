@@ -24,27 +24,35 @@ import no.sintef.bvr.sampler.Sampler;
 public class Population {
 
     private static final int WORKER_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final double BREEDING_FRACTION = 0.10;
+    private static final double BREEDING_FRACTION = 0.50;
 
     private final static Random random = new Random();
 
     private final ExecutorService executor;
     private final CompletionService<List<Individual>> tasks;
+    private final Sampler sampler;
+    private final int sampleSize;
     private final EvolutionListener listener;
     private final int capacity;
     private final int eliteSize;
     private final List<Individual> individuals;
 
-    public Population(ProductLine productLine, int size, Sampler sampler, EvolutionListener listener) {
+    public Population(ProductLine productLine, int size, Sampler sampler, int sampleSize, EvolutionListener listener) {
         this.executor = Executors.newFixedThreadPool(WORKER_COUNT);
         this.tasks = new ExecutorCompletionService<>(executor);
         this.capacity = size;
         this.eliteSize = (int) (capacity * BREEDING_FRACTION);
-        this.individuals = new ArrayList<>(capacity + 2 * eliteSize);
+        this.individuals = new ArrayList<>(capacity + 3 * eliteSize);
+        this.sampler = sampler;
+        this.sampleSize = sampleSize;
         for (int individual = 0; individual < size; individual++) {
-            individuals.add(new Individual(sampler.sample(productLine)));
+            individuals.add(spontaneousIndividual());
         }
         this.listener = listener;
+    }
+
+    private Individual spontaneousIndividual() {
+        return new Individual(sampler.sample(sampleSize));
     }
 
     public Sample fittest() {
@@ -119,8 +127,16 @@ public class Population {
             eachChild.mutate();
             eachChild.evaluate(goal);
         }
+        if (spontaneousGenerationOccurs()) {
+            children.add(spontaneousIndividual());
+        }
         return children;
     }
+
+    private boolean spontaneousGenerationOccurs() {
+        return random.nextDouble() < SPONTANEOUS_BIRTH_PROBABILITY;
+    }
+    private static final double SPONTANEOUS_BIRTH_PROBABILITY = 0.05;
 
     private void rank(final Goal goal) {
         final CountDownLatch latch = new CountDownLatch(individuals.size());

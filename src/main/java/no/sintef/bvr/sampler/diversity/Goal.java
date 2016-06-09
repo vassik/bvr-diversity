@@ -32,8 +32,8 @@ public class Goal {
     }
 
     double error(Sample sample) {
-        return Math.pow(diversity.of(sample), 2) 
-                + Math.pow(1D - coverage.of(sample), 2);
+        return diversity.of(sample) 
+                + Math.pow((1D - coverage.of(sample)) , 2);
     }
 
     double fitnessOf(Individual individual) {

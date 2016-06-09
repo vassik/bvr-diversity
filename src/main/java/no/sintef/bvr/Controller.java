@@ -7,8 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import no.sintef.bvr.metrics.Coverage;
 import no.sintef.bvr.metrics.DistanceMatrix;
 import no.sintef.bvr.metrics.Diversity;
@@ -49,15 +54,15 @@ public class Controller {
             ProductLine productLine = read.from(inputFile);
             display.productLineLoaded(productLine);
 
-            Sampler sampler = new DiversitySampler(sampleSize, DESIRED_DIVERSITY, maxEpoch, new SingleThreadedEvolutionReporter(display));
-            Sample result = sampler.sample(productLine);
+            Sampler sampler = new DiversitySampler(productLine, DESIRED_DIVERSITY, maxEpoch, new SingleThreadedEvolutionReporter(display));
+            Sample result = sampler.sample(sampleSize);
 
             Diversity diversity = new Diversity();
             Coverage coverage = new Coverage();
             display.show(result, coverage.of(result), diversity.of(result));
 
             storeDistanceMatrix(result);
-
+ 
         } catch (IOException ex) {
             display.unknownFile(SOURCE_FILE);
 
@@ -113,30 +118,38 @@ class MultiThreadEvolutionReporter extends EvolutionListener {
 
     @Override
     public void epoch(final int epoch, final int MAX_EPOCH, final double fitness) {
-        tasks.add(new Runnable() {
-            @Override
-            public void run() {
-                display.progress(epoch, MAX_EPOCH, fitness);
+        try {
+            tasks.put(new Runnable() {
+                @Override
+                public void run() {
+                    display.progress(epoch, MAX_EPOCH, fitness);
+                }
             }
+            );
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
         }
-        );
     }
 
     @Override
     public void complete() {
-        tasks.add(new Runnable() {
-
-            @Override
-            public void run() {
-                processor.stop();
-                try {
-                    thread.join(5000L);
-
-                } catch (InterruptedException ex) {
-                    // TODO do something
+        try {
+            tasks.put(new Runnable() {
+                
+                @Override
+                public void run() {
+                    processor.stop();
+                    try {
+                        thread.join(5000L);
+                        
+                    } catch (InterruptedException ex) {
+                        // TODO do something
+                    }
                 }
-            }
-        });
+            });
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     static class Processor implements Runnable {
@@ -162,9 +175,8 @@ class MultiThreadEvolutionReporter extends EvolutionListener {
                     if (stopped) {
                         break;
                     }
-
                 } catch (InterruptedException ex) {
-
+                    throw new RuntimeException(ex);
                 }
             }
         }

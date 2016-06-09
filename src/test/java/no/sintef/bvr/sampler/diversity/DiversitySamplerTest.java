@@ -22,18 +22,22 @@ public class DiversitySamplerTest {
     public void shouldYieldTheCorrectNumberOfProducts() {
         ProductLine productLine = new ProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(4, 1D, 5);
-        Sample result = sampler.sample(productLine);
+        DiversitySampler sampler = new DiversitySampler(productLine, 1D, 5);
+        Sample result = sample(sampler, 4);
 
         assertEquals(4, result.size());
+    }
+
+    private Sample sample(DiversitySampler sampler, int count) {
+        return sampler.sample(count);
     }
 
     @Test
     public void shouldYieldTheCorrectProducts() {
         ProductLine productLine = new ProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(2, 1);
-        Sample result = sampler.sample(productLine);
+        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        Sample result = sample(sampler, 2);
 
         Set<Sample> candidates = new HashSet<>();
         candidates.add(new Sample(productLine,
@@ -51,8 +55,8 @@ public class DiversitySamplerTest {
         ProductLine productLine = new ProductLine(2);
         productLine.addConstraint(feature(1).implies(feature(0)));
 
-        DiversitySampler sampler = new DiversitySampler(2, 1);
-        Sample result = sampler.sample(productLine);
+        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        Sample result = sample(sampler, 2);
 
         Set<Sample> candidates = new HashSet<>();
         candidates.add(new Sample(productLine,
@@ -66,8 +70,8 @@ public class DiversitySamplerTest {
     public void shouldYieldALowDiversitySample() {
         ProductLine productLine = new ProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(2, 0);
-        Sample result = sampler.sample(productLine);
+        DiversitySampler sampler = new DiversitySampler(productLine, 0);
+        Sample result = sample(sampler, 2);
 
         Diversity diversity = new Diversity();
         assertEquals(0D, diversity.of(result));
@@ -77,8 +81,8 @@ public class DiversitySamplerTest {
     public void shouldYieldAHighDiversitySample() {
         ProductLine productLine = new ProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(2, 1);
-        Sample result = sampler.sample(productLine);
+        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        Sample result = sample(sampler, 2);
 
         Diversity diversity = new Diversity();
         assertEquals(1D, diversity.of(result));
@@ -92,11 +96,11 @@ public class DiversitySamplerTest {
         productLine.addConstraint(feature(3).implies(feature(1)));
         productLine.addConstraint(feature(4).implies(feature(0)));
 
-        DiversitySampler sampler = new DiversitySampler(4, 1);
-        Sample result = sampler.sample(productLine);
-        
+        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        Sample result = sample(sampler, 4);
+
         System.out.println("Result:\n" + result);
-        
+
         Diversity diversity = new Diversity();
         System.out.println(" + diversity: " + diversity.of(result));
     }

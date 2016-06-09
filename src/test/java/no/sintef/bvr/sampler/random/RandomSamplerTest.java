@@ -18,20 +18,15 @@ import org.junit.Test;
 
 public class RandomSamplerTest {
 
-    private final ProductLine productLine;
-
-    public RandomSamplerTest() {
-        productLine = new ProductLine(5);
-    }
-    
+ 
     @Test
     public void testUnderConstraints() {
         ProductLine productLine = new ProductLine(2);
         productLine.addConstraint(feature(0).and(feature(1)));
 
-        Sampler sampler = new RandomSampler(1);
+        Sampler sampler = new RandomSampler(productLine); 
         
-        Sample sample = sampler.sample(productLine);
+        Sample sample = sampler.sample(1);
         
         assertFalse(sample.isEmpty());
         final Product expected = new Product(productLine, true, true);

@@ -40,25 +40,23 @@ class FeatureGenerator extends Generator {
 
     private static final int OPTIONS = 2;
 
-    private final Random random;
     private final Generator delegate;
     private final Feature feature;
-    private Boolean value;
+    private final Boolean value;
     private int alternatives;
 
     public FeatureGenerator(Generator delegate, Product product, Feature feature) {
         super(product);
-        this.random = new Random();
         this.delegate = delegate;
         this.feature = feature;
         this.alternatives = OPTIONS;
-        this.value = random.nextBoolean();
+        this.value = false;
         product.set(feature, value);
     }
 
     @Override
     public boolean hasNext() {
-        return delegate.hasNext() || alternatives > 1;
+        return  alternatives > 1 || delegate.hasNext();
     }
 
     @Override
