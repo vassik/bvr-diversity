@@ -2,20 +2,19 @@
 package no.sintef.bvr.constraints;
 
 /**
- *
- * @author franckc
+ * Fluent interface to build logical expression
  */
 public class Builder {
     
-    public static FeatureByIndex feature(int index) {
+    public static LogicalExpression feature(int index) {
         return new FeatureByIndex(index);
     }
     
-    public static FeatureByName feature(String name) {
+    public static LogicalExpression feature(String name) {
         return new FeatureByName(name);
     }
     
-    public static Negation not(LogicalExpression expression) {
+    public static LogicalExpression not(LogicalExpression expression) {
         return new Negation(expression);
     }
        

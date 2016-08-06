@@ -1,6 +1,6 @@
 package no.sintef.bvr.constraints;
 
-import no.sintef.bvr.Product;
+import no.sintef.bvr.spl.Product;
 
 public abstract class LogicalExpression {
 
@@ -16,10 +16,7 @@ public abstract class LogicalExpression {
         return new Disjunction(this, operand);
     }
 
-    public boolean isViolatedBy(Product product) {
-        return !evaluateOn(product);
-    }
 
-    protected abstract boolean evaluateOn(Product product);
+    public abstract <T> T accept(Visitor<T> visitor); 
 
 }

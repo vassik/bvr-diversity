@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import no.sintef.bvr.Feature;
-import no.sintef.bvr.ProductLine;
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.Feature;
+import no.sintef.bvr.spl.FeatureSet;
+import static no.sintef.bvr.constraints.Builder.feature;
+import no.sintef.bvr.constraints.LogicalExpression;
 import static no.sintef.bvr.constraints.Builder.feature;
 
 /**
@@ -19,7 +22,7 @@ public class ProductLineGenerator {
         ProductLineGenerator generate = new ProductLineGenerator();
         final int featureCount = 20;
         
-        ProductLine productLine = generate.oneProductLine(featureCount);
+        ConstrainedProductLine productLine = generate.oneProductLine(featureCount);
         
         final String fileName = String.format("gen_pl_%d.txt", featureCount);
         try (FileOutputStream file = new FileOutputStream(fileName)) {
@@ -37,23 +40,24 @@ public class ProductLineGenerator {
         random = new Random();
     }
 
-    public ProductLine oneProductLine(int featureCount) {
-        ProductLine productLine = new ProductLine(featureCount);
-        buildLayout(productLine, new ArrayList<Feature>(productLine.features()));
-        return productLine;
+    public ConstrainedProductLine oneProductLine(int featureCount) {
+        final ArrayList<LogicalExpression> constraints = new ArrayList<>();
+        buildLayout(constraints, 
+                new ArrayList<Feature>(featureCount));
+        return new ConstrainedProductLine(FeatureSet.fromTemplate(featureCount, "f%d"), constraints);
     }
 
-    private Feature buildLayout(ProductLine productLine, List<Feature> remaining) {
+    private Feature buildLayout(List<LogicalExpression> constraints, List<Feature> remaining) {
         assert remaining.size() > 0 : "Cannot make a layout for no feature!";
 
         if (remaining.size() == 1) {
-            return atomicFeature(productLine, remaining);
+            return atomicFeature(constraints, remaining);
         }
 
-        return compositeFeature(productLine, remaining);
+        return compositeFeature(constraints, remaining);
     }
 
-    private Feature atomicFeature(ProductLine productLine, List<Feature> remaining) {
+    private Feature atomicFeature(List<LogicalExpression> constraints, List<Feature> remaining) {
         return removeOne(remaining);
     }
 
@@ -63,13 +67,13 @@ public class ProductLineGenerator {
         return options.remove(0);
     }
 
-    private Feature compositeFeature(ProductLine productLine, List<Feature> remaining) {
+    private Feature compositeFeature(List<LogicalExpression> constraints, List<Feature> remaining) {
         Feature root = removeOne(remaining);
         int childrenCount = chooseNumberOfChildren(remaining);
         int[] childrenBudget = allocate(remaining.size(), childrenCount);
         for (int eachChildBudget : childrenBudget) {
-            Feature childRoot = buildLayout(productLine, takeFrom(remaining, eachChildBudget));
-            productLine.addConstraint(feature(childRoot.name()).implies(feature(root.name())));
+            Feature childRoot = buildLayout(constraints, takeFrom(remaining, eachChildBudget));
+            constraints.add(feature(childRoot.name()).implies(feature(root.name())));
         }
         return root;
     }

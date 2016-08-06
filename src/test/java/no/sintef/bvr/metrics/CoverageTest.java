@@ -1,70 +1,70 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package no.sintef.bvr.metrics;
 
-import static junit.framework.Assert.assertEquals;
-import no.sintef.bvr.ProductLine;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.spl.Factory;
+import no.sintef.bvr.spl.FeatureSet;
+import no.sintef.bvr.spl.ProductSet;
 import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
 
 
 public class CoverageTest {
 
-    private final int featureCount;
-    private final ProductLine productLine;
+    private static final int FEATURE_COUNT = 5;
+    
+    private final FeatureSet features;
+    private final Factory create;
     private final Coverage coverage;
 
     public CoverageTest() {
-        featureCount = 5;
-        productLine = new ProductLine(featureCount);
-        coverage = new Coverage();
+        features = FeatureSet.fromDefaultTemplate(FEATURE_COUNT);
+        create = new Factory(features);
+        coverage = new Coverage(features);
     }
 
     @Test
-    public void allFeatureShouldHaveACoverageOf05() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(false, false, false, false, false);
-
+    public void theFullProductShouldHaveACoverageOf05() {
+        ProductSet sample = new ProductSet(create.aFullProduct());
         assertEquals(0.5, coverage.of(sample));
     }
 
     @Test
-    public void noFeatureShouldHaveACoverageOf05() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, true, true, true);
+    public void twoFullProductsShouldHaveACoverageOf0_5() {
+        ProductSet sample = new ProductSet(
+                create.aFullProduct(),
+                create.aFullProduct());
+        assertEquals(0.5, coverage.of(sample)); 
+    }
 
+    @Test
+    public void theEmptyProductShouldHaveACoverageOf05() {
+        ProductSet sample = new ProductSet(create.anEmptyProduct());
         assertEquals(0.5, coverage.of(sample));
     }
 
-        @Test
+    @Test
     public void allFeatureAndNoFeatureShouldHaveACoverageOf1() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, true, true, true);
-        sample.addProduct(false, false, false, false, false);
-
+        ProductSet sample = new ProductSet(
+                create.anEmptyProduct(),
+                create.aFullProduct());
+        
         assertEquals(1D, coverage.of(sample));
     }
-
     
     @Test
-    public void coverageOfTwoOppositeProductsShouldBeOne() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(false, false, true, true, true);
-
-        assertEquals(1., coverage.of(sample));
+    public void aRandomProductShouldCoverHalfOfTheFeature() {
+        ProductSet sample = new ProductSet(create.aRandomProduct());
+        assertEquals(0.5, coverage.of(sample));
     }
-    
+
     @Test
     public void coverageOfTwoSingleFeatureProducts() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, false, false, false, false);
-        sample.addProduct(false, true, false, false, false);
+        ProductSet sample = create.createProductSet(
+                new boolean[][]{
+                    {true, false, false, false, false},
+                    {false, true, false, false, false}
+                });
 
-        assertEquals(7D / (2 * featureCount), coverage.of(sample));
+        assertEquals(7D / (2 * features.count()), coverage.of(sample));
     }
-    
+
 }

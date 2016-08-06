@@ -1,27 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package no.sintef.bvr;
+package no.sintef.bvr.spl;
 
 import java.util.Objects;
 
-
+/**
+ * A feature, identified by its name. 
+ */
 public class Feature {
-    
-    private final int index;
+
     private final String name;
 
-    public Feature(int index, String name) {
-        this.index = index;
-        this.name = String.format(name, index);
+    public Feature(String name) {
+        this.name = name;
     }
-
-    public int index() {
-        return index;
-    }
-
+    
     public String name() {
         return name;
     }
@@ -29,7 +20,6 @@ public class Feature {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 59 * hash + this.index;
         hash = 59 * hash + Objects.hashCode(this.name);
         return hash;
     }
@@ -43,17 +33,12 @@ public class Feature {
             return false;
         }
         final Feature other = (Feature) obj;
-        if (this.index != other.index) {
-            return false;
-        }
         return Objects.equals(this.name, other.name);
     }
 
     @Override
     public String toString() {
-        return name + "@" + index ;
+        return name;
     }
-    
-    
-    
+
 }

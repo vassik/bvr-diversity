@@ -5,6 +5,8 @@
  */
 package no.sintef.bvr;
 
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.ProductLineReader;
 import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -27,9 +29,9 @@ public class ProductLineBuilderTest {
                     + "  - not (F1 implies (F2 or F3))\n"
                     ;
         
-        ProductLine result = read.from(text); 
+        ConstrainedProductLine result = read.from(text); 
         
-        assertEquals(3, result.featureCount());
+        assertEquals(3, result.features().count());
         assertEquals(2, result.constraints().size());
     }
     
@@ -45,9 +47,9 @@ public class ProductLineBuilderTest {
                     + "  - F3 or (F2 and F4)\n"
                     ;
         
-        ProductLine result = read.from(text); 
+        ConstrainedProductLine result = read.from(text); 
         
-        assertEquals(7, result.featureCount());
+        assertEquals(7, result.features().count());
         assertEquals(4, result.constraints().size());
     }
     

@@ -7,8 +7,8 @@ package no.sintef.bvr.generator;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import no.sintef.bvr.Feature;
-import no.sintef.bvr.ProductLine;
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.Feature;
 import no.sintef.bvr.constraints.LogicalExpression;
 
 public class ProductLineWriter {
@@ -19,12 +19,12 @@ public class ProductLineWriter {
         this.output = new PrintStream(output);
     }
 
-    void write(ProductLine productLine) {
+    void write(ConstrainedProductLine productLine) {
         output.println("features:");
         int position = 0;
-        for(Feature eachFeature: productLine) {
+        for(Feature eachFeature: productLine.features()) {
             output.print(eachFeature.name());
-            if (position < productLine.featureCount() - 1) {
+            if (position < productLine.features().count() - 1) {
                 output.print(", ");
             }
             position++;

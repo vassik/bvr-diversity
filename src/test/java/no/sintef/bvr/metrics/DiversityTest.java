@@ -1,86 +1,87 @@
 package no.sintef.bvr.metrics;
 
-import static junit.framework.Assert.assertEquals;
-import no.sintef.bvr.ProductLine;
-import no.sintef.bvr.sampler.Sample;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import no.sintef.bvr.spl.Factory;
+import no.sintef.bvr.spl.FeatureSet;
+import no.sintef.bvr.spl.ProductSet;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import static junit.framework.Assert.assertEquals;
 
+@RunWith(Parameterized.class)
 public class DiversityTest {
 
+    private static final int FEATURE_COUNT = 5;
     private final Diversity diversity;
-    private final int featureCount;
-    private final ProductLine productLine;
+    private final ProductSet sample;
+    private final double expectation;
 
-    public DiversityTest() {
-        featureCount = 5;
+    public DiversityTest(boolean[][] isActive, double expectedDiversity) {
         diversity = new Diversity();
-        productLine = new ProductLine(featureCount);
+        final Factory factory = new Factory(FeatureSet.fromDefaultTemplate(FEATURE_COUNT));
+        sample = factory.createProductSet(isActive);
+        expectation = expectedDiversity;
     }
 
     @Test
-    public void twoSimilarProductShouldHaveAZeroDiversity() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(true, true, false, false, false);
-
-        assertEquals(0., diversity.of(sample));
+    public void shouldBeCorrect() {
+        assertEquals(expectation, diversity.of(sample));
     }
 
-    @Test
-    public void twoOppositeProductShouldHaveAOneDiversity() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(false, false, true, true, true);
+    @Parameterized.Parameters
+    public static Collection<Object[]> tests() {
+        List<Object[]> tests = new ArrayList<>();
 
-        assertEquals(1., diversity.of(sample));
+        tests.add(twoSimilarProducts());
+
+        tests.add(twoOppositeProducts());
+
+        tests.add(twoProductsWithOneFeatureThatVaries());
+
+        tests.add(new Object[]{
+            4D / (4 * 3),
+            new boolean[][]{
+                {true, true, true, true, true},
+                {true, true, true, true, true},
+                {true, true, true, false, true},
+                {true, true, false, false, false}
+            }
+        });
+
+        return tests;
     }
 
-    @Test
-    public void oneFeatureDifferenceShouldLeadToADiversityOf() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(true, true, false, false, true);
-
-        assertEquals(1D / featureCount, diversity.of(sample));
-    }
-    
-    @Test
-    public void testMaximumAbsoluteDiversity() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(false, false, true, true, true);
-
-        assertEquals(2D, diversity.absolute(sample));
+    private static Object[] twoProductsWithOneFeatureThatVaries() {
+        return new Object[]{
+            1D / FEATURE_COUNT,
+            new boolean[][]{
+                {true, true, false, false, false},
+                {true, true, false, false, true}
+            }
+        };
     }
 
-    @Test
-    public void testMinimumAbsoluteDiversity() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(true, true, false, false, false);
-
-        assertEquals(0D, diversity.absolute(sample));
-    }
-    
-    @Test
-    public void testMediumAbsoluteDiversity() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, false, false, false);
-        sample.addProduct(true, true, false, false, true);
-        sample.addProduct(true, true, false, true, true);
-
-        assertEquals(8D/5, diversity.absolute(sample), 1e-6);
+    private static Object[] twoOppositeProducts() {
+        return new Object[]{
+            1D,
+            new boolean[][]{
+                {true, true, false, false, false},
+                {false, false, true, true, true}
+            }
+        };
     }
 
-    @Test
-    public void sandbox() {
-        Sample sample = new Sample(productLine);
-        sample.addProduct(true, true, true, true, true);
-        sample.addProduct(true, true, true, true, true);
-        sample.addProduct(true, true, true, false, true);
-        sample.addProduct(true, true, false, false, false);
-
-        assertEquals(4D / (4 * 3), diversity.of(sample));
+    private static Object[] twoSimilarProducts() {
+        return new Object[]{
+            0D,
+            new boolean[][]{
+                {true, true, false, false, false},
+                {true, true, false, false, false}
+            }
+        };
     }
 
 }

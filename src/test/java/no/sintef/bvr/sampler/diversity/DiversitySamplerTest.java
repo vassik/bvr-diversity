@@ -9,69 +9,76 @@ import java.util.HashSet;
 import java.util.Set;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import no.sintef.bvr.Product;
-import no.sintef.bvr.ProductLine;
-import static no.sintef.bvr.constraints.Builder.feature;
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.FeatureSet;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.metrics.Diversity;
-import no.sintef.bvr.sampler.Sample;
 import org.junit.Test;
+import static no.sintef.bvr.constraints.Builder.feature;
+import static no.sintef.bvr.constraints.Builder.feature;
 
 public class DiversitySamplerTest {
 
     @Test
     public void shouldYieldTheCorrectNumberOfProducts() {
-        ProductLine productLine = new ProductLine(2);
+        ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
         DiversitySampler sampler = new DiversitySampler(productLine, 1D, 5);
-        Sample result = sample(sampler, 4);
+        ProductSet result = sample(sampler, 4);
 
         assertEquals(4, result.size());
     }
 
-    private Sample sample(DiversitySampler sampler, int count) {
+    private ProductSet sample(DiversitySampler sampler, int count) {
         return sampler.sample(count);
     }
 
     @Test
     public void shouldYieldTheCorrectProducts() {
-        ProductLine productLine = new ProductLine(2);
+        ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
         DiversitySampler sampler = new DiversitySampler(productLine, 1);
-        Sample result = sample(sampler, 2);
+        ProductSet result = sample(sampler, 2);
 
-        Set<Sample> candidates = new HashSet<>();
-        candidates.add(new Sample(productLine,
-                new Product(productLine, true, true),
-                new Product(productLine, false, false)));
-        candidates.add(new Sample(productLine,
-                new Product(productLine, false, true),
-                new Product(productLine, true, false)));
+        FeatureSet features = FeatureSet.fromDefaultTemplate(2);
+        Set<ProductSet> candidates = new HashSet<>();
+        candidates.add(
+                new ProductSet(
+                        new Product(features, true, true),
+                        new Product(features, false, false)));
+        candidates.add(
+                new ProductSet(
+                        new Product(features, false, true),
+                        new Product(features, true, false)));
 
         assertTrue("Invalid sample:\n" + result + "\n candidates are " + candidates, candidates.contains(result));
     }
 
     @Test
     public void shouldYieldTheCorrectProductsUnderConstraints() {
-        ProductLine productLine = new ProductLine(2);
-        productLine.addConstraint(feature(1).implies(feature(0)));
+        ConstrainedProductLine productLine
+                = new ConstrainedProductLine(2, feature(1).implies(feature(0)));
 
         DiversitySampler sampler = new DiversitySampler(productLine, 1);
-        Sample result = sample(sampler, 2);
+        ProductSet result = sample(sampler, 2);
 
-        Set<Sample> candidates = new HashSet<>();
-        candidates.add(new Sample(productLine,
-                new Product(productLine, true, true),
-                new Product(productLine, false, false)));
+        FeatureSet features = FeatureSet.fromDefaultTemplate(2);
+        Set<ProductSet> candidates = new HashSet<>();
+        candidates.add(
+                new ProductSet(
+                        new Product(features, true, true),
+                        new Product(features, false, false)));
 
         assertTrue("Invalid sample:\n" + result + "\n candidates are " + candidates, candidates.contains(result));
     }
 
     @Test
     public void shouldYieldALowDiversitySample() {
-        ProductLine productLine = new ProductLine(2);
+        ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
         DiversitySampler sampler = new DiversitySampler(productLine, 0);
-        Sample result = sample(sampler, 2);
+        ProductSet result = sample(sampler, 2);
 
         Diversity diversity = new Diversity();
         assertEquals(0D, diversity.of(result));
@@ -79,10 +86,10 @@ public class DiversitySamplerTest {
 
     @Test
     public void shouldYieldAHighDiversitySample() {
-        ProductLine productLine = new ProductLine(2);
+        ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
         DiversitySampler sampler = new DiversitySampler(productLine, 1);
-        Sample result = sample(sampler, 2);
+        ProductSet result = sample(sampler, 2);
 
         Diversity diversity = new Diversity();
         assertEquals(1D, diversity.of(result));
@@ -90,14 +97,15 @@ public class DiversitySamplerTest {
 
     @Test
     public void sandbox() {
-        ProductLine productLine = new ProductLine(5);
-        productLine.addConstraint(feature(1).implies(feature(0)));
-        productLine.addConstraint(feature(2).implies(feature(1)));
-        productLine.addConstraint(feature(3).implies(feature(1)));
-        productLine.addConstraint(feature(4).implies(feature(0)));
+        ConstrainedProductLine productLine 
+                = new ConstrainedProductLine(5,
+                        feature(1).implies(feature(0)),
+                        feature(2).implies(feature(1)),
+                        feature(3).implies(feature(1)),
+                        feature(4).implies(feature(0)));
 
         DiversitySampler sampler = new DiversitySampler(productLine, 1);
-        Sample result = sample(sampler, 4);
+        ProductSet result = sample(sampler, 4);
 
         System.out.println("Result:\n" + result);
 

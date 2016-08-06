@@ -1,7 +1,8 @@
 
 package no.sintef.bvr.constraints;
 
-import no.sintef.bvr.Product;
+import java.util.Objects;
+import no.sintef.bvr.spl.Product;
 
 public class Negation extends LogicalExpression {
     
@@ -10,15 +11,42 @@ public class Negation extends LogicalExpression {
     public Negation(LogicalExpression operand) {
         this.operand = operand;
     }
-
-    @Override
-    protected boolean evaluateOn(Product product) {
-        return !operand.evaluateOn(product);
-    }
     
     @Override
     public String toString() {
         return "(not " + operand + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + Objects.hashCode(this.operand);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Negation other = (Negation) obj;
+        if (!Objects.equals(this.operand, other.operand)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.onNegation(operand);
     }
     
 }

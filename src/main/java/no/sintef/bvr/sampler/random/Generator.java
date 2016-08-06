@@ -1,22 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package no.sintef.bvr.sampler.random;
 
 import java.util.Iterator;
-import java.util.Random;
-import no.sintef.bvr.Feature;
-import no.sintef.bvr.Product;
-import no.sintef.bvr.ProductLine;
+import no.sintef.bvr.spl.Feature;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductLine;
 
 public abstract class Generator implements Iterator<Product> {
 
     public static Generator createFor(ProductLine productLine) {
-        Product template = new Product(productLine, new boolean[productLine.featureCount()]);
+        Product template = new Product(productLine.features());
         Generator generator = new EmptyGenerator(template);
-        for (Feature eachFeature : productLine) {
+        for (Feature eachFeature : productLine.features()) {
             generator = new FeatureGenerator(generator, template, eachFeature);
         }
         return generator;
@@ -103,7 +98,7 @@ class EmptyGenerator extends Generator {
     @Override
     public Product next() {
         done = true;
-        return product;
+        return product.copy();
 
     }
 

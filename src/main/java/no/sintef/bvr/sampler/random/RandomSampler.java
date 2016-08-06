@@ -1,69 +1,57 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package no.sintef.bvr.sampler.random;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import no.sintef.bvr.Product;
-import no.sintef.bvr.ProductLine;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductLine;
+import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.sampler.Sampler;
 
 /**
- * Random Sampling of product lines
+ * Reservoir sampling
  */
 public class RandomSampler implements Sampler {
 
-    private final Random random;
     private final ProductLine productLine;
-    private final List<Product> cache;
+    private final Random random;
 
     public RandomSampler(ProductLine productLine) {
-        this.random = new Random();
+        this(productLine, new Random());
+    }
+
+    public RandomSampler(ProductLine productLine, Random random) {
         this.productLine = productLine;
-        cache = new ArrayList<>();
-        fillCache();
+        this.random = random;
     }
 
-    private void fillCache() {
-        final Generator generator = Generator.createFor(productLine);
-        while (generator.hasNext()) {
-            Product product = new Product(generator.next());
-            if (product.isValid()) {
-                cache.add(product);
-            }
-        }
-        if (cache.isEmpty()) {
-            throw new IllegalStateException("There is no valid product");
-        }
-    }
+    public ProductSet sample(int sampleSize) {
+        final List<Product> selectedProducts = new ArrayList<>(sampleSize);
 
-    @Override
-    public Sample sample(int productCount) {
-        if (productCount > cache.size()) {
-            throw new IllegalArgumentException(String.format("The product line has only %d valid products", cache.size()));
-        }
-        Sample result = new Sample(productLine);
-        List<Integer> indexes = new ArrayList<>(cache.size());
-        for(int i=0 ; i<cache.size() ; i++) {
-            indexes.add(i);
+        List<Integer> availableIndexes = allPossibleIndexes();
+        for (int i = 0; i < sampleSize; i++) {
+            abortIfNoMoreIndexes(availableIndexes, sampleSize);
+            int selectedIndex = availableIndexes.remove(random.nextInt(availableIndexes.size()));
+            selectedProducts.add(productLine.products().withKey(selectedIndex));
         }
         
-        for(int i=0 ;i<productCount;i++) {
-            Integer chosenIndex = random.nextInt(indexes.size());
-            result.add(cache.get(indexes.get(chosenIndex)));
-            indexes.remove(chosenIndex);
-        }
-
-        return result;
+        return new ProductSet(selectedProducts);
     }
 
-    protected boolean randomFeature() {
-        return random.nextBoolean();
+    private void abortIfNoMoreIndexes(List<Integer> availableIndexes, int sampleSize) throws IllegalArgumentException {
+        if (availableIndexes.isEmpty()) {
+            final String error
+                    = String.format("Cannot choose %d products out of %d!", sampleSize, productLine.products().size());
+            throw new IllegalArgumentException(error);
+        }
+    }
+
+    private List<Integer> allPossibleIndexes() {
+        List<Integer> availableIndex = new ArrayList<>(productLine.products().size());
+        for(int i=0 ; i<productLine.products().size() ; i++) {
+            availableIndex.add(i);
+        }
+        return availableIndex;
     }
 
 }

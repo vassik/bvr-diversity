@@ -1,6 +1,6 @@
 package no.sintef.bvr.constraints;
 
-import no.sintef.bvr.Product;
+import java.util.Objects;
 
 
 public class Conjunction extends LogicalExpression {
@@ -14,13 +14,44 @@ public class Conjunction extends LogicalExpression {
     }
 
     @Override
-    protected boolean evaluateOn(Product product) {
-        return leftOperand.evaluateOn(product) && rightOperand.evaluateOn(product);
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.leftOperand);
+        hash = 67 * hash + Objects.hashCode(this.rightOperand);
+        return hash;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Conjunction other = (Conjunction) obj;
+        if (!Objects.equals(this.leftOperand, other.leftOperand)) {
+            return false;
+        }
+        if (!Objects.equals(this.rightOperand, other.rightOperand)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 
     @Override
     public String toString() {
         return "(" + leftOperand + " and " + rightOperand + ")";
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.onConjunction(leftOperand, rightOperand);
     }
     
     

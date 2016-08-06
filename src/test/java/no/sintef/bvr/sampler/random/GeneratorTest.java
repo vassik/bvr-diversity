@@ -8,8 +8,8 @@ package no.sintef.bvr.sampler.random;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import no.sintef.bvr.Product;
-import no.sintef.bvr.ProductLine;
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.Product;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ public class GeneratorTest {
 
     @Test
     public void testGenerator() {
-        ProductLine productLine = new ProductLine(featureCount);
+        ConstrainedProductLine productLine = new ConstrainedProductLine(featureCount);
 
         Generator generator = Generator.createFor(productLine);
 
@@ -54,7 +54,7 @@ public class GeneratorTest {
             if (products.contains(nextProduct)) {
                 throw new AssertionError("Duplicated product '" + nextProduct + "'(" + products + ")");
             }
-            products.add(new Product(nextProduct));
+            products.add(nextProduct.copy());
         }
         return products.size();
     }

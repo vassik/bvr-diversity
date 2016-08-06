@@ -1,13 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package no.sintef.bvr.sampler.diversity;
 
-import no.sintef.bvr.ProductLine;
-import no.sintef.bvr.sampler.random.RandomSampler;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.sampler.diversity.objective.MultiObjective;
+import no.sintef.bvr.sampler.diversity.objective.DesiredValue;
+import no.sintef.bvr.metrics.Coverage;
+import no.sintef.bvr.metrics.PairWiseDistanceError;
+import no.sintef.bvr.spl.ProductLine;
+import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.sampler.Sampler;
 
 public class DiversitySampler implements Sampler {
@@ -17,7 +16,7 @@ public class DiversitySampler implements Sampler {
     private static final int MAX_EPOCH = 1000;
 
     private final EvolutionListener listener;
-    private final Goal goal;
+    private final MultiObjective goal;
     private final int maxEpoch;
 
     private final ProductLine productLine;
@@ -36,14 +35,16 @@ public class DiversitySampler implements Sampler {
     
     public DiversitySampler(ProductLine productLine, double diversity, int maxEpoch, EvolutionListener listener) {
         this.productLine = productLine;
-        this.goal = new Goal(diversity);
+        this.goal = new MultiObjective(
+                new DesiredValue(new Coverage(productLine.features()), 1), 
+                new DesiredValue(new PairWiseDistanceError(diversity), 0));
         this.listener = listener;
         this.maxEpoch = maxEpoch;
     }
 
     @Override
-    public Sample sample(int productCount) {
-        final Population population = new Population(productLine, POPULATION_SIZE, new RandomSampler(productLine), productCount, listener);
+    public ProductSet sample(int productCount) {
+        final Population population = new Population(productLine, POPULATION_SIZE, productCount, listener);
         return population.convergeTo(goal, maxEpoch);
     }
 

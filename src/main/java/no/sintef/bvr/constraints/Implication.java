@@ -1,7 +1,8 @@
 
 package no.sintef.bvr.constraints;
 
-import no.sintef.bvr.Product;
+import java.util.Objects;
+import no.sintef.bvr.spl.Product;
 
 public class Implication extends LogicalExpression {
 
@@ -14,13 +15,43 @@ public class Implication extends LogicalExpression {
     }
 
     @Override
-    protected boolean evaluateOn(Product product) {
-        return !leftOperand.evaluateOn(product) || rightOperand.evaluateOn(product);
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + Objects.hashCode(this.leftOperand);
+        hash = 83 * hash + Objects.hashCode(this.rightOperand);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Implication other = (Implication) obj;
+        if (!Objects.equals(this.leftOperand, other.leftOperand)) {
+            return false;
+        }
+        if (!Objects.equals(this.rightOperand, other.rightOperand)) {
+            return false;
+        }
+        return true;
     }
     
+        
     @Override
     public String toString() {
         return "(" + leftOperand + " implies " + rightOperand + ")";
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.onImplication(leftOperand, rightOperand);
     }
     
     

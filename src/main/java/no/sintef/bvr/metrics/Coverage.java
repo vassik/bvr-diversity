@@ -6,14 +6,22 @@
 package no.sintef.bvr.metrics;
 
 import java.util.BitSet;
-import no.sintef.bvr.Product;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.spl.FeatureSet;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductSet;
 
 
-public class Coverage {
+public class Coverage implements Metric<ProductSet> {
         
-    public double of(Sample sample) {
-        final int featureCount = sample.productLine().featureCount();
+    private final FeatureSet features;
+
+    public Coverage(FeatureSet features) {
+        this.features = features;
+    }
+        
+    @Override
+    public double of(ProductSet sample) {
+        final int featureCount = features.count();
         final BitSet covered = new BitSet(featureCount);
         final BitSet notCovered = new BitSet(featureCount);
         for (Product anyProduct: sample) {

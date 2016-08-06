@@ -5,19 +5,19 @@
  */
 package no.sintef.bvr.metrics;
 
-import no.sintef.bvr.Product;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductSet;
 
 public class DistanceMatrix {
 
-    public double[][] of(Sample sample) {
-        assert !sample.isEmpty() : "Cannot compute a distance matrix for an empty sample!";
+    public double[][] of(ProductSet products) {
+        assert !products.isEmpty() : "Cannot compute a distance matrix for an empty sample!";
         
-        double[][] matrix = new double[sample.size()][sample.size()];
-        for (int i=0 ; i<sample.size() ;i++) {
-            Product product_i = sample.productAt(i);
-            for (int j=i+1 ; j< sample.size() ; j++) {
-                Product product_j = sample.productAt(j);
+        double[][] matrix = new double[products.size()][products.size()];
+        for (int i=0 ; i<products.size() ;i++) {
+            Product product_i = products.withKey(i);
+            for (int j=i+1 ; j< products.size() ; j++) {
+                Product product_j = products.withKey(j);
                 final double distance = product_i.distanceWith(product_j);
                 matrix[i][j] = distance;
                 matrix[j][i] = distance;

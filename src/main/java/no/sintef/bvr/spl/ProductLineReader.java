@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package no.sintef.bvr;
+package no.sintef.bvr.spl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,12 +28,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
  */
 public class ProductLineReader {
 
-    public ProductLine from(String text) throws IOException {
+    public ConstrainedProductLine from(String text) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(text.getBytes());
         return from(input);
     }
 
-    public ProductLine from(InputStream input) throws IOException {
+    public ConstrainedProductLine from(InputStream input) throws IOException {
         ProductLineLexer lexer = new ProductLineLexer(new ANTLRInputStream(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ProductLineParser parser = new ProductLineParser(tokens);
@@ -44,14 +44,14 @@ public class ProductLineReader {
 }
 
 
-class ProductLineBuilder  extends ProductLineBaseVisitor<ProductLine> {
+class ProductLineBuilder  extends ProductLineBaseVisitor<ConstrainedProductLine> {
 
     @Override
-    public ProductLine visitProductLine(ProductLineParser.ProductLineContext ctx) {
+    public ConstrainedProductLine visitProductLine(ProductLineParser.ProductLineContext ctx) {
         List<String> features = ctx.features().accept(new FeatureBuilder());
         List<LogicalExpression> constraints = ctx.constraints().accept(new ConstraintListBuilder());
         
-        return new ProductLine(features, constraints); 
+        return new ConstrainedProductLine(FeatureSet.fromNames(features), constraints); 
     }
 
 }

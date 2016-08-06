@@ -7,31 +7,30 @@ package no.sintef.bvr.sampler.random;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import no.sintef.bvr.Product;
-import no.sintef.bvr.ProductLine;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.FeatureSet;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.sampler.Sampler;
-import static no.sintef.bvr.constraints.Builder.feature;
 import org.junit.Test;
-
-
+import static no.sintef.bvr.constraints.Builder.feature;
+import static no.sintef.bvr.constraints.Builder.feature;
 
 public class RandomSamplerTest {
 
- 
     @Test
     public void testUnderConstraints() {
-        ProductLine productLine = new ProductLine(2);
-        productLine.addConstraint(feature(0).and(feature(1)));
+        ConstrainedProductLine productLine 
+                = new ConstrainedProductLine(2, feature(0).and(feature(1)));
 
-        Sampler sampler = new RandomSampler(productLine); 
-        
-        Sample sample = sampler.sample(1);
-        
+        Sampler sampler = new RandomSampler(productLine);
+
+        ProductSet sample = sampler.sample(1);
+
         assertFalse(sample.isEmpty());
-        final Product expected = new Product(productLine, true, true);
-        assertEquals(expected, sample.productAt(0));
-                    
+        final Product expected = new Product(FeatureSet.fromDefaultTemplate(2), true, true);
+        assertEquals(expected, sample.withKey(0));
+
     }
-    
+
 }

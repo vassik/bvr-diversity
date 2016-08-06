@@ -5,21 +5,20 @@
  */
 package no.sintef.bvr.metrics;
 
-import no.sintef.bvr.Product;
-import no.sintef.bvr.sampler.Sample;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.ProductSet;
 
 /**
  *
- * @author franckc
  */
-public class Diversity {
+public class Diversity implements Metric<ProductSet>{
     
-    public double of(Sample sample) {
+    public double of(ProductSet sample) {
         final int maximum = sample.size() * (sample.size()-1);
         return absolute(sample) / maximum;
     }
     
-    public double absolute(Sample sample) {
+    public double absolute(ProductSet sample) {
         assert !sample.isEmpty(): "Invalid empty sample!";
         
         double sum = 0;

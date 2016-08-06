@@ -1,5 +1,11 @@
 package no.sintef.bvr;
 
+import no.sintef.bvr.spl.FeatureSet;
+import no.sintef.bvr.spl.ProductLine;
+import no.sintef.bvr.spl.ProductSet;
+import no.sintef.bvr.spl.Product;
+import no.sintef.bvr.spl.Feature;
+import no.sintef.bvr.spl.ProductLineReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,17 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import no.sintef.bvr.metrics.Coverage;
 import no.sintef.bvr.metrics.DistanceMatrix;
 import no.sintef.bvr.metrics.Diversity;
-import no.sintef.bvr.sampler.Sample;
 import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.diversity.DiversitySampler;
 import no.sintef.bvr.sampler.diversity.EvolutionListener;
@@ -48,18 +48,15 @@ public class Controller {
                 maxEpoch = Integer.parseInt(arguments[2]);
             }
 
-            InputStream inputFile = new FileInputStream(pathToProductLine);
-
-            ProductLineReader read = new ProductLineReader();
-            ProductLine productLine = read.from(inputFile);
+            ProductLine productLine = loadProductLine(pathToProductLine);
             display.productLineLoaded(productLine);
 
             Sampler sampler = new DiversitySampler(productLine, DESIRED_DIVERSITY, maxEpoch, new SingleThreadedEvolutionReporter(display));
-            Sample result = sampler.sample(sampleSize);
+            ProductSet result = sampler.sample(sampleSize);
 
             Diversity diversity = new Diversity();
-            Coverage coverage = new Coverage();
-            display.show(result, coverage.of(result), diversity.of(result));
+            Coverage coverage = new Coverage(productLine.features());
+            display.show(productLine.features(), result, coverage.of(result), diversity.of(result));
 
             storeDistanceMatrix(result);
  
@@ -69,7 +66,14 @@ public class Controller {
         }
     }
 
-    private void storeDistanceMatrix(Sample result) throws FileNotFoundException {
+    private ProductLine loadProductLine(String pathToProductLine) throws IOException, FileNotFoundException {
+        InputStream inputFile = new FileInputStream(pathToProductLine);
+        ProductLineReader read = new ProductLineReader();
+        ProductLine productLine = read.from(inputFile);
+        return productLine;
+    }
+
+    private void storeDistanceMatrix(ProductSet result) throws FileNotFoundException {
         DistanceMatrix distanceMatrix = new DistanceMatrix();
         double[][] matrix = distanceMatrix.of(result);
         CsvDistanceMatrixFormatter csv = new CsvDistanceMatrixFormatter(new FileOutputStream("distance_matrix.csv"));
@@ -208,19 +212,19 @@ class Console {
     }
 
     void productLineLoaded(ProductLine productLine) {
-        show(PRODUCT_LINE_OVERVIEW, productLine.featureCount(), productLine.constraints().size());
+        show(PRODUCT_LINE_OVERVIEW, productLine.features().count(), productLine.products().size());
     }
 
-    void show(Sample sample, double coverage, double diversity) {
+    void show(FeatureSet features, ProductSet sample, double coverage, double diversity) {
         show("\nResults (Cov=%.3f %%; FAD=%.3f):\n", coverage, diversity);
-        showTableHeader(sample);
-        showTableBody(sample);
+        showTableHeader(features, sample);
+        showTableBody(features, sample);
     }
 
-    private void showTableHeader(Sample sample) {
+    private void showTableHeader(FeatureSet features, ProductSet sample) {
         StringBuilder buffer = new StringBuilder();
         buffer.append(String.format(TABLE_COLUMN_WIDTH, "P/F"));
-        for (Feature eachFeature : sample.productLine().features()) {
+        for (Feature eachFeature : features) {
             buffer.append(String.format(TABLE_COLUMN_WIDTH, eachFeature.name()));
         }
         buffer.append("\n");
@@ -229,11 +233,11 @@ class Console {
 
     private static final String TABLE_COLUMN_WIDTH = "%4s ";
 
-    private void showTableBody(Sample sample) {
-        for (int index = 0; index < sample.size(); index++) {
+    private void showTableBody(FeatureSet features, ProductSet products) {
+        for (int index = 0; index < products.size(); index++) {
             show(" P%02d", index);
-            for (Feature eachFeature : sample.productLine()) {
-                Product eachProduct = sample.productAt(index);
+            for (Feature eachFeature : features) {
+                Product eachProduct = products.withKey(index);
                 if (eachProduct.offers(eachFeature)) {
                     show(TABLE_COLUMN_WIDTH, "X");
                 } else {

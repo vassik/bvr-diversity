@@ -8,10 +8,11 @@ package no.sintef.bvr.generator;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import static junit.framework.Assert.assertEquals;
-import no.sintef.bvr.ProductLine;
-import static no.sintef.bvr.constraints.Builder.feature;
+import no.sintef.bvr.spl.ConstrainedProductLine;
+import no.sintef.bvr.spl.EnumeratedProductLine;
 import static no.sintef.bvr.constraints.Builder.not;
 import org.junit.Test;
+import static no.sintef.bvr.constraints.Builder.feature;
 
 /**
  *
@@ -29,7 +30,7 @@ public class ProductLineWirterTests {
 
     @Test
     public void testWritingProductLineWithoutConstraints() {
-        ProductLine productLine = new ProductLine(2);
+        ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
         csv.write(productLine);
 
@@ -44,8 +45,8 @@ public class ProductLineWirterTests {
 
     @Test
     public void testWritingProductLineWithConstraints() {
-        ProductLine productLine = new ProductLine(2);
-        productLine.addConstraint(feature("f0").implies(feature("f1")));
+        ConstrainedProductLine productLine 
+                = new ConstrainedProductLine(2, feature("f0").implies(feature("f1")));
 
         csv.write(productLine);
 
@@ -60,8 +61,9 @@ public class ProductLineWirterTests {
 
     @Test
     public void testWritingCompoundConstraints() {
-        ProductLine productLine = new ProductLine(3);
-        productLine.addConstraint(feature("f1").implies(feature("f0").or(not(feature("f2")))));
+        ConstrainedProductLine productLine 
+                = new ConstrainedProductLine(3, 
+                        feature("f1").implies(feature("f0").or(not(feature("f2")))));
 
         csv.write(productLine);
 
