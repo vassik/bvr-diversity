@@ -21,22 +21,26 @@ import no.sintef.bvr.sampler.diversity.evolution.selection.TruncationSelection;
  */
 public class TheIndividualFactory implements EvolutionFactory {
 
+    private static final int POPULATION_SIZE = 100;
     private static final double MUTATION_PROBABILITY = 0.1;
     private static final double BREEDING_FRACTION = 0.25;
 
     private final Random random;
     private final ProductLine productLine;
     private final int sampleSize;
+    private final TruncationSelection selection;
 
     public TheIndividualFactory(Random random, ProductLine productLine, int sampleSize) {
         this.random = random;
         this.productLine = productLine;
         this.sampleSize = sampleSize;
+        this.selection = new TruncationSelection(BREEDING_FRACTION);
     }
 
     @Override
-    public Population anEmptyPopulation(int capacity) {
-        return new Population(capacity, new TruncationSelection(BREEDING_FRACTION));
+    public Population anEmptyPopulation() {
+        int capacity = (int) (POPULATION_SIZE + 3 * Math.round(BREEDING_FRACTION * POPULATION_SIZE));
+        return new Population(capacity, POPULATION_SIZE, selection);
     }
 
     @Override

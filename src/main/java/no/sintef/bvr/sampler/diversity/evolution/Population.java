@@ -12,27 +12,33 @@ import no.sintef.bvr.sampler.diversity.evolution.selection.TruncationSelection;
  */
 public class Population {
 
+    public static final int DEFAULT_DESIRED_SIZE = 100;
+
     private final int capacity;
+    private final int desiredSize;
     private final List<Individual> individuals;
     private final Selection selection;
 
     public Population(int capacity) {
-        this(capacity, new TruncationSelection(0.25));
+        this(capacity, DEFAULT_DESIRED_SIZE, new TruncationSelection(0.25));
     }
 
-    public Population(int capacity, Selection selectionStrategy) {
+    public Population(int capacity, int desiredSize, Selection selectionStrategy) {
         this.capacity = capacity;
+        this.desiredSize = desiredSize;
         this.individuals = new ArrayList<>(capacity);
         this.selection = selectionStrategy;
+    }
+    
+    public boolean isFull() {
+        return size() >= desiredSize;
     }
 
     public Iterable<Couple> pairUp() {
         return selection.select(new Random(), this);
     }
 
-    public void spare(int desiredSize) {
-        assert desiredSize >= 0 : "Invalid desired size";
-
+    public void cutDown() {
         if (size() > desiredSize) {
             int count = size() - desiredSize;
             for (int index = 0; index < count; index++) {

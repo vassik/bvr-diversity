@@ -9,16 +9,11 @@ import no.sintef.bvr.spl.ProductSet;
  */
 public class Individual implements Comparable<Individual> {
 
-    private final ProductSet products;
     private double fitness;
 
     public Individual(ProductSet products) {
         this.products = products;
         this.fitness = 0;
-    }
-
-    public ProductSet products() {
-        return products;
     }
 
     void evaluateAgainst(Objective objective) {
@@ -33,14 +28,17 @@ public class Individual implements Comparable<Individual> {
     public double fitness() {
         return this.fitness;
     }
-    
-    //
-    
+
+    private final ProductSet products;
+
+    public ProductSet products() {
+        return products;
+    }
+
     public int size() {
         return products.size();
     }
-    
-    
+
     public boolean contains(Product product) {
         return products.contains(product);
     }
@@ -66,12 +64,10 @@ public class Individual implements Comparable<Individual> {
         final Individual other = (Individual) obj;
         return Objects.equals(this.products, other.products);
     }
-    
-    
+
     @Override
     public String toString() {
         return products.toString();
     }
-    
 
 }

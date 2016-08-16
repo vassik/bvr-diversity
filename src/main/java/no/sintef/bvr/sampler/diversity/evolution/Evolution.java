@@ -7,18 +7,11 @@ import java.util.Random;
 public class Evolution {
 
     private static final double SPONTANEOUS_BIRTH_PROBABILITY = 0.1;
-    private static final double BREEDING_RATIO = 0.25;
-
-    private final int size = 100;
-    private final int coupleCount;
-    private final int childrenCount;
 
     private final EvolutionFactory create;
     private final EvolutionListener listener;
 
     public Evolution(EvolutionFactory create, EvolutionListener listener) {
-        coupleCount = (int) Math.round(BREEDING_RATIO * size);
-        childrenCount = 3;
         this.listener = listener;
         this.create = create;
     }
@@ -34,14 +27,14 @@ public class Evolution {
             }
             breed(population, objective);
             population.rank();
-            population.spare(size);
+            population.cutDown();
         }
         return population.fittest();
     }
 
     private Population initialisePopulation(Objective objective) {
-        final Population population = create.anEmptyPopulation(size + childrenCount * coupleCount);
-        for (int i = 0; i < size; i++) {
+        final Population population = create.anEmptyPopulation();
+        while (!population.isFull()) {
             final Individual individual = create.aRandomIndividual();
             individual.evaluateAgainst(objective);
             population.add(individual);

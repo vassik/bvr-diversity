@@ -6,7 +6,7 @@ package no.sintef.bvr.sampler.diversity.evolution;
  */
 public interface EvolutionFactory {
     
-    Population anEmptyPopulation(int capacity);
+    Population anEmptyPopulation();
     
     Individual aRandomIndividual();
     
