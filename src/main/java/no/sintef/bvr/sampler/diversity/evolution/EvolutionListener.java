@@ -1,5 +1,5 @@
 
-package no.sintef.bvr.sampler.diversity;
+package no.sintef.bvr.sampler.diversity.evolution;
 
 /**
  * Interface to follow-up during the evolution

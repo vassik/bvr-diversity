@@ -1,4 +1,3 @@
-
 package no.sintef.bvr.metrics;
 
 import no.sintef.bvr.spl.Product;
@@ -26,9 +25,8 @@ public class PairWiseDistanceError implements Metric<ProductSet> {
         double sum = 0;
         final int productCount = products.size();
         for (int i = 0; i < productCount; i++) {
-            final Product product_i = products.withKey(i);
             for (int j = i + 1; j < productCount; j++) {
-                final double distance = product_i.distanceWith(products.withKey(j));
+                final double distance = products.withKey(i).distanceWith(products.withKey(j));
                 final double error = desiredDistance - distance;
                 sum += error * error;
             }

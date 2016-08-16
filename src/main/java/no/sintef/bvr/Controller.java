@@ -20,7 +20,7 @@ import no.sintef.bvr.metrics.DistanceMatrix;
 import no.sintef.bvr.metrics.Diversity;
 import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.diversity.DiversitySampler;
-import no.sintef.bvr.sampler.diversity.EvolutionListener;
+import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
 
 public class Controller {
 

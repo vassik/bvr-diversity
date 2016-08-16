@@ -1,18 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package no.sintef.bvr.sampler.diversity.objective;
+
+package no.sintef.bvr.sampler.diversity.evolution;
 
 import java.util.Arrays;
 import java.util.List;
-import no.sintef.bvr.spl.ProductSet;
 
 /**
  * Combine multiple objective using the sum of squared errors.
  */
-public class MultiObjective extends Objective {
+public final class MultiObjective extends Objective {
 
     private final List<Objective> objectives;
 
@@ -22,7 +17,7 @@ public class MultiObjective extends Objective {
     }
 
     @Override
-    public double distanceFrom(ProductSet candidate) {
+    public double distanceFrom(Individual candidate) { 
         double total = 0D;
         for(Objective eachObjective: objectives) {
             total += Math.pow(eachObjective.distanceFrom(candidate), 2);

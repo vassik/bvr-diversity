@@ -1,7 +1,9 @@
 
-package no.sintef.bvr.sampler.diversity.objective;
+package no.sintef.bvr.sampler.diversity;
 
+import no.sintef.bvr.sampler.diversity.evolution.Objective;
 import no.sintef.bvr.metrics.Metric;
+import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import no.sintef.bvr.spl.ProductSet;
 
 /**
@@ -18,8 +20,8 @@ public class DesiredValue extends Objective {
     }
     
     @Override
-    public double distanceFrom(ProductSet object) {
-        return target - metric.of(object);
+    public double distanceFrom(Individual object) {
+        return target - metric.of(object.products());
     }
     
 }

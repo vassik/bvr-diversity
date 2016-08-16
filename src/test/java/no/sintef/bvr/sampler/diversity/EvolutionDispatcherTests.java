@@ -5,6 +5,8 @@
  */
 package no.sintef.bvr.sampler.diversity;
 
+import no.sintef.bvr.sampler.diversity.evolution.EvolutionDispatcher;
+import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
 import org.junit.Test;
 import static org.mockito.Mockito.*;
 import org.mockito.Matchers;

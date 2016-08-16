@@ -3,7 +3,8 @@ package no.sintef.bvr.sampler.diversity.crossover;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import no.sintef.bvr.sampler.diversity.Individual;
+import no.sintef.bvr.sampler.diversity.evolution.Couple;
+import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import no.sintef.bvr.spl.Factory;
 import no.sintef.bvr.spl.FeatureSet;
 import org.junit.Test;
@@ -34,19 +35,19 @@ public class SinglePointCrossoverTest {
     public void shouldRejectParentsWhoseSizeFallBehindTheCutPoint() {
         mother = anIndividualWithSize(CUT_POINT - 1);
 
-        crossover.breed(father, mother);
+        crossover.breed(new Couple(father, mother));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectBreedingParentsWhoseSizeDiffers() {
         mother = anIndividualWithSize(PRODUCT_COUNT + 1);
 
-        crossover.breed(father, mother);
+        crossover.breed(new Couple(father, mother));
     }
 
     @Test
     public void theChildrensProductsShouldMatchTheParentsProducts() {
-        List<Individual> children = crossover.breed(father, mother);
+        List<Individual> children = crossover.breed(new Couple(father, mother));
 
         Set<Individual> expectedChildren = new HashSet<>();
         expectedChildren.add(anIndividualWithProducts(0, 1, 6, 7));

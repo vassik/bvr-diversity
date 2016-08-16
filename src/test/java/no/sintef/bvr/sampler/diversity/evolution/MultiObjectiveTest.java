@@ -1,8 +1,8 @@
-package no.sintef.bvr.sampler.diversity.objective;
+package no.sintef.bvr.sampler.diversity.evolution;
 
-import no.sintef.bvr.spl.ProductSet;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import no.sintef.bvr.sampler.diversity.DesiredValue;
+import no.sintef.bvr.sampler.diversity.evolution.MultiObjective;
+import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -22,7 +22,7 @@ public class MultiObjectiveTest extends ObjectiveTest {
 
     private static DesiredValue anObjectiveAt(double distance) {
         DesiredValue objective = mock(DesiredValue.class);
-        when(objective.distanceFrom(any(ProductSet.class))).thenReturn(distance);
+        when(objective.distanceFrom(any(Individual.class))).thenReturn(distance);
         return objective;
     }
 

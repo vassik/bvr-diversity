@@ -1,7 +1,8 @@
 
-package no.sintef.bvr.sampler.diversity.objective;
+package no.sintef.bvr.sampler.diversity.evolution;
 
-import no.sintef.bvr.spl.ProductSet;
+import no.sintef.bvr.sampler.diversity.evolution.Objective;
+import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -13,7 +14,7 @@ import org.junit.Test;
 public abstract class ObjectiveTest {
     
     private final Objective objective;
-    private final ProductSet anyCandidate;
+    private final Individual anyCandidate;
     private final double expectedDistance;
     
     public ObjectiveTest(Objective objective, double expectedDistance) {

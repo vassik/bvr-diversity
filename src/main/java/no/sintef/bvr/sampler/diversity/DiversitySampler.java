@@ -1,8 +1,10 @@
 
 package no.sintef.bvr.sampler.diversity;
 
-import no.sintef.bvr.sampler.diversity.objective.MultiObjective;
-import no.sintef.bvr.sampler.diversity.objective.DesiredValue;
+import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
+import no.sintef.bvr.sampler.diversity.evolution.Evolution;
+import java.util.Random;
+import no.sintef.bvr.sampler.diversity.evolution.MultiObjective;
 import no.sintef.bvr.metrics.Coverage;
 import no.sintef.bvr.metrics.PairWiseDistanceError;
 import no.sintef.bvr.spl.ProductLine;
@@ -44,8 +46,8 @@ public class DiversitySampler implements Sampler {
 
     @Override
     public ProductSet sample(int productCount) {
-        final Population population = new Population(productLine, POPULATION_SIZE, productCount, listener);
-        return population.convergeTo(goal, maxEpoch);
+        final Evolution evolution = new Evolution(new TheIndividualFactory(new Random(), productLine, productCount), listener);
+        return evolution.convergeTo(goal, maxEpoch).products();
     }
 
 }

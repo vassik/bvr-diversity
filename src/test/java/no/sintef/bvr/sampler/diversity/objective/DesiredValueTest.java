@@ -1,6 +1,8 @@
 
 package no.sintef.bvr.sampler.diversity.objective;
 
+import no.sintef.bvr.sampler.diversity.evolution.ObjectiveTest;
+import no.sintef.bvr.sampler.diversity.DesiredValue;
 import no.sintef.bvr.metrics.Metric;
 import no.sintef.bvr.spl.ProductSet;
 import static org.mockito.Mockito.when;

@@ -1,30 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package no.sintef.bvr.sampler.diversity.mutations;
 
+import java.util.Random;
+import no.sintef.bvr.sampler.diversity.evolution.Mutation;
 import no.sintef.bvr.spl.Product;
-import no.sintef.bvr.sampler.diversity.Individual;
+import no.sintef.bvr.sampler.diversity.evolution.Individual;
 
 /**
- *
- * @author franckc
+ * Replace a product in a product set
  */
-public class SingleProductMutation {
+public class SingleProductMutation implements Mutation {
 
     private final Product target;
     private final Product replacement;
 
-    public SingleProductMutation(Product targetProduct, Product replacement) {
-        this.target = targetProduct;
+    public SingleProductMutation(Product target, Product replacement) {
+        this.target = target;
         this.replacement = replacement;
     }
-    
 
+    @Override
     public void apply(Individual individual) {
         individual.products().replace(target, replacement);
     }
-    
+
 }
