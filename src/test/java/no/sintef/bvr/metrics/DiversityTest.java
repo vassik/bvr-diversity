@@ -19,7 +19,7 @@ public class DiversityTest {
     private final ProductSet sample;
     private final double expectation;
 
-    public DiversityTest(boolean[][] isActive, double expectedDiversity) {
+    public DiversityTest(double expectedDiversity, boolean[][] isActive) {
         diversity = new Diversity();
         final Factory factory = new Factory(FeatureSet.fromDefaultTemplate(FEATURE_COUNT));
         sample = factory.createProductSet(isActive);
