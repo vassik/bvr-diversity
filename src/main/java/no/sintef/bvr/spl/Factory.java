@@ -69,4 +69,8 @@ public class Factory {
         return aProductWith(activeFeatures);
     }
 
+    public ProductLine aProductLineWithProducts(FeatureSet features, int... productCodes) {
+        return new EnumeratedProductLine(features, productSetFromCodes(productCodes));
+    }
+
 }

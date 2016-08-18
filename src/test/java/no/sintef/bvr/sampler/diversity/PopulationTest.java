@@ -26,32 +26,31 @@ public class PopulationTest {
     @Test(expected = IllegalStateException.class)
     public void shouldRejectAddingOneMoreThanCapacity() {
         fillUpPopulation();
-        
+
         population.add(anIndividualWithProducts(2, 3, 4, 5, 6));
     }
-        
-    private final void fillUpPopulation() {
-        for(int i=0 ; i<capacity ; i++) {
-            population.add(new Individual(create.productSetFromCodes(i, i+1, i+2)));
+
+    private void fillUpPopulation() {
+        for (int i = 0; i < capacity; i++) {
+            population.add(anIndividualWithProducts(i, i + 1, i + 2));
         }
     }
 
     private Individual anIndividualWithProducts(int... productCodes) {
-        return new Individual(create.productSetFromCodes(productCodes));
+        return new ProductSetIndividual(create.productSetFromCodes(productCodes));
     }
 
-    
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void shouldRejectAddingManyMoreThanCapacity() {
         List<Individual> newComers = createIndividuals(capacity + 1);
-        
+
         population.addAll(newComers);
     }
 
     private List<Individual> createIndividuals(int count) {
         final List<Individual> newComers = new ArrayList<>(count);
-        for(int i=0 ; i<count ; i++) {
-            newComers.add(anIndividualWithProducts(i+1,i+2,i+3));
+        for (int i = 0; i < count; i++) {
+            newComers.add(anIndividualWithProducts(i + 1, i + 2, i + 3));
         }
         return newComers;
     }

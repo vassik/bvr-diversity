@@ -1,4 +1,3 @@
-
 package no.sintef.bvr.sampler.diversity;
 
 import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
@@ -10,6 +9,7 @@ import no.sintef.bvr.metrics.PairWiseDistanceError;
 import no.sintef.bvr.spl.ProductLine;
 import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.sampler.Sampler;
+import no.sintef.bvr.sampler.diversity.evolution.Individual;
 
 public class DiversitySampler implements Sampler {
 
@@ -22,11 +22,11 @@ public class DiversitySampler implements Sampler {
     private final int maxEpoch;
 
     private final ProductLine productLine;
-    
+
     public DiversitySampler(ProductLine productLine) {
         this(productLine, DEFAULT_DIVERSITY, MAX_EPOCH);
     }
-    
+
     public DiversitySampler(ProductLine productLine, double diversity) {
         this(productLine, diversity, MAX_EPOCH);
     }
@@ -34,11 +34,11 @@ public class DiversitySampler implements Sampler {
     public DiversitySampler(ProductLine productLine, double diversity, int maxEpoch) {
         this(productLine, diversity, maxEpoch, new EvolutionListener());
     }
-    
+
     public DiversitySampler(ProductLine productLine, double diversity, int maxEpoch, EvolutionListener listener) {
         this.productLine = productLine;
         this.goal = new MultiObjective(
-                new DesiredValue(new Coverage(productLine.features()), 1), 
+                new DesiredValue(new Coverage(productLine.features()), 1),
                 new DesiredValue(new PairWiseDistanceError(diversity), 0));
         this.listener = listener;
         this.maxEpoch = maxEpoch;
@@ -47,10 +47,8 @@ public class DiversitySampler implements Sampler {
     @Override
     public ProductSet sample(int productCount) {
         final Evolution evolution = new Evolution(new TheIndividualFactory(new Random(), productLine, productCount), listener);
-        return evolution.convergeTo(goal, maxEpoch).products();
+        final Individual champion = evolution.convergeTo(goal, maxEpoch);
+        return ((ProductSetIndividual) champion).products();
     }
 
 }
-
-
-

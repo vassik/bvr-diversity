@@ -4,6 +4,7 @@ import no.sintef.bvr.sampler.diversity.evolution.Crossover;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import no.sintef.bvr.sampler.diversity.ProductSetIndividual;
 import no.sintef.bvr.sampler.diversity.evolution.Couple;
 import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import no.sintef.bvr.spl.Product;
@@ -29,14 +30,15 @@ public class SinglePointCrossover implements Crossover {
 
     @Override
     public List<Individual> breed(Couple couple) {
-        checkCompatibility(couple);
-        checkCutPointValidity(couple);
-
         final List<Product> childA = new LinkedList<>();
         final List<Product> childB = new LinkedList<>();
 
-        final Individual father = couple.father();
-        final Individual mother = couple.mother();
+        final ProductSetIndividual father = (ProductSetIndividual) couple.father();
+        final ProductSetIndividual mother = (ProductSetIndividual) couple.mother();
+
+        checkCompatibility(father, mother);
+        checkCutPointValidity(father, mother);
+
         for (int index = 0; index < father.size(); index++) {
             if (index < cutPoint) {
                 childA.add(father.products().withKey(index).copy());
@@ -48,21 +50,21 @@ public class SinglePointCrossover implements Crossover {
         }
 
         final ArrayList<Individual> children = new ArrayList<>();
-        children.add(new Individual(new ProductSet(childA)));
-        children.add(new Individual(new ProductSet(childB)));
+        children.add(new ProductSetIndividual(new ProductSet(childA)));
+        children.add(new ProductSetIndividual(new ProductSet(childB)));
         return children;
     }
 
-    private void checkCompatibility(Couple couple) throws IllegalArgumentException {
-        if (couple.father().size() != couple.mother().size()) {
-            final String message = String.format("Parents have different length! (%d != %d)", couple.father().size(), couple.mother().size());
+    private void checkCompatibility(ProductSetIndividual father, ProductSetIndividual mother) throws IllegalArgumentException {
+        if (father.size() != mother.size()) {
+            final String message = String.format("Parents have different length! (%d != %d)", father.size(), mother.size());
             throw new IllegalArgumentException(message);
         }
     }
 
-    private void checkCutPointValidity(Couple couple) throws IllegalArgumentException {
-        if (cutPoint >= couple.father().size() || cutPoint >= couple.mother().size()) {
-            final String message = String.format("Cut-point exceeds parents' length! (%d >= %d)", cutPoint, couple.father().size());
+    private void checkCutPointValidity(ProductSetIndividual father, ProductSetIndividual mother) throws IllegalArgumentException {
+        if (cutPoint >= father.size() || cutPoint >= mother.size()) {
+            final String message = String.format("Cut-point exceeds parents' length! (%d >= %d)", cutPoint, father.size());
             throw new IllegalArgumentException(message);
         }
     }

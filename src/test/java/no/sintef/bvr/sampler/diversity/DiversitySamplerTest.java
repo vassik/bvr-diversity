@@ -18,7 +18,6 @@ import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.metrics.Diversity;
 import org.junit.Test;
 import static no.sintef.bvr.constraints.Builder.feature;
-import static no.sintef.bvr.constraints.Builder.feature;
 import org.junit.Ignore;
 
 public class DiversitySamplerTest {
@@ -37,7 +36,7 @@ public class DiversitySamplerTest {
         return sampler.sample(count);
     }
 
-    @Ignore
+    //@Ignore
     public void shouldYieldTheCorrectProducts() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
@@ -77,7 +76,8 @@ public class DiversitySamplerTest {
         assertTrue("Invalid sample:\n" + result + "\n candidates are " + candidates, candidates.contains(result));
     }
 
-    @Ignore
+    //@Ignore
+    @Test
     public void shouldYieldALowDiversitySample() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 

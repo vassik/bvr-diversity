@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import static junit.framework.Assert.assertEquals;
 import no.sintef.bvr.spl.ConstrainedProductLine;
-import no.sintef.bvr.spl.EnumeratedProductLine;
 import static no.sintef.bvr.constraints.Builder.not;
 import org.junit.Test;
 import static no.sintef.bvr.constraints.Builder.feature;

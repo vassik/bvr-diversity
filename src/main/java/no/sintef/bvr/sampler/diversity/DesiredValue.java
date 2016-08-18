@@ -20,8 +20,9 @@ public class DesiredValue extends Objective {
     }
     
     @Override
-    public double distanceFrom(Individual object) {
-        return target - metric.of(object.products());
+    public double distanceFrom(Individual individual) {
+        ProductSetIndividual productSet = (ProductSetIndividual) individual;
+        return target - metric.of(productSet.products());
     }
     
 }

@@ -3,6 +3,7 @@ package no.sintef.bvr.sampler.diversity.crossover;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import no.sintef.bvr.sampler.diversity.ProductSetIndividual;
 import no.sintef.bvr.sampler.diversity.evolution.Couple;
 import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import no.sintef.bvr.spl.Factory;
@@ -61,11 +62,11 @@ public class SinglePointCrossoverTest {
         for (int index = 0; index < desiredSize; index++) {
             productCodes[index] = index;
         }
-        return new Individual(factory.productSetFromCodes(productCodes));
+        return new ProductSetIndividual(factory.productSetFromCodes(productCodes));
     }
 
     private Individual anIndividualWithProducts(int... productCodes) {
-        return new Individual(factory.productSetFromCodes(productCodes));
+        return new ProductSetIndividual(factory.productSetFromCodes(productCodes));
     }
 
 }

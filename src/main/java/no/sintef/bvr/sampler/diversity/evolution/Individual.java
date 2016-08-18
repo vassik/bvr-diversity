@@ -7,13 +7,13 @@ import no.sintef.bvr.spl.ProductSet;
 /**
  * Individual being evolved by the genetic algorithm.
  */
-public class Individual implements Comparable<Individual> {
+public abstract class Individual implements Comparable<Individual> {
 
+    private static final int UNKNOWN_FITNESS = 0;
     private double fitness;
 
-    public Individual(ProductSet products) {
-        this.products = products;
-        this.fitness = 0;
+    public Individual() {
+        this.fitness = UNKNOWN_FITNESS;
     }
 
     void evaluateAgainst(Objective objective) {
@@ -21,53 +21,12 @@ public class Individual implements Comparable<Individual> {
     }
 
     @Override
-    public int compareTo(Individual other) {
+    public final int compareTo(Individual other) {
         return Double.compare(other.fitness, fitness);
     }
 
     public double fitness() {
         return this.fitness;
-    }
-
-    private final ProductSet products;
-
-    public ProductSet products() {
-        return products;
-    }
-
-    public int size() {
-        return products.size();
-    }
-
-    public boolean contains(Product product) {
-        return products.contains(product);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 59 * hash + Objects.hashCode(this.products);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Individual other = (Individual) obj;
-        return Objects.equals(this.products, other.products);
-    }
-
-    @Override
-    public String toString() {
-        return products.toString();
     }
 
 }

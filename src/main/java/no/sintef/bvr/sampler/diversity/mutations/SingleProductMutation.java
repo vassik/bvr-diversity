@@ -1,6 +1,6 @@
 package no.sintef.bvr.sampler.diversity.mutations;
 
-import java.util.Random;
+import no.sintef.bvr.sampler.diversity.ProductSetIndividual;
 import no.sintef.bvr.sampler.diversity.evolution.Mutation;
 import no.sintef.bvr.spl.Product;
 import no.sintef.bvr.sampler.diversity.evolution.Individual;
@@ -20,7 +20,7 @@ public class SingleProductMutation implements Mutation {
 
     @Override
     public void apply(Individual individual) {
-        individual.products().replace(target, replacement);
+        ((ProductSetIndividual) individual).products().replace(target, replacement);
     }
 
 }

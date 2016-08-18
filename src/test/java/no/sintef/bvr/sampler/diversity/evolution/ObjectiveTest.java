@@ -1,5 +1,6 @@
 package no.sintef.bvr.sampler.diversity.evolution;
 
+import no.sintef.bvr.sampler.diversity.ProductSetIndividual;
 import no.sintef.bvr.spl.ProductSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,7 +25,7 @@ public abstract class ObjectiveTest {
     }
 
     private Individual createACandidate() {
-        Individual individual = mock(Individual.class);
+        ProductSetIndividual individual = mock(ProductSetIndividual.class);
         when(individual.products()).thenReturn(mock(ProductSet.class));
         return individual;
     }

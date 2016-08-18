@@ -50,7 +50,7 @@ public class TheIndividualFactory implements EvolutionFactory {
             final Product randomProduct = aRandomProduct();
             products.add(randomProduct);
         }
-        return new Individual(new ProductSet(products));
+        return new ProductSetIndividual(new ProductSet(products));
     }
 
     private Product aRandomProduct() {
