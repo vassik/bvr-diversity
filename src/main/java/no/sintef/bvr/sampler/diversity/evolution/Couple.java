@@ -1,13 +1,10 @@
-
 package no.sintef.bvr.sampler.diversity.evolution;
-
-import no.sintef.bvr.sampler.diversity.evolution.Individual;
 
 /**
  * Couple of individual, ready to mate
  */
 public class Couple {
-    
+
     private final Individual father;
     private final Individual mother;
 
@@ -23,7 +20,10 @@ public class Couple {
     public Individual mother() {
         return mother;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "(" + father.toString() + ", " + mother.toString() + ")";
+    }
+
 }

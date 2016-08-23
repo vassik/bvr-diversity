@@ -18,7 +18,9 @@ import no.sintef.bvr.spl.ProductSet;
 import no.sintef.bvr.metrics.Diversity;
 import org.junit.Test;
 import static no.sintef.bvr.constraints.Builder.feature;
-import org.junit.Ignore;
+import static no.sintef.bvr.sampler.diversity.ObjectiveFactory.maximiseDiversity;
+import static no.sintef.bvr.sampler.diversity.ObjectiveFactory.maximiseDiversityAndCoverage;
+import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
 
 public class DiversitySamplerTest {
 
@@ -26,7 +28,7 @@ public class DiversitySamplerTest {
     public void shouldYieldTheCorrectNumberOfProducts() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(productLine, 1D, 5);
+        DiversitySampler sampler = new DiversitySampler(productLine, maximiseDiversity(), 5);
         ProductSet result = sample(sampler, 4);
 
         assertEquals(4, result.size());
@@ -40,7 +42,7 @@ public class DiversitySamplerTest {
     public void shouldYieldTheCorrectProducts() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        DiversitySampler sampler = new DiversitySampler(productLine, maximiseDiversityAndCoverage(productLine.features()));
         ProductSet result = sample(sampler, 2);
 
         FeatureSet features = FeatureSet.fromDefaultTemplate(2);
@@ -62,7 +64,7 @@ public class DiversitySamplerTest {
         ConstrainedProductLine productLine
                 = new ConstrainedProductLine(2, feature(1).implies(feature(0)));
 
-        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        DiversitySampler sampler = new DiversitySampler(productLine, maximiseDiversityAndCoverage(productLine.features()));
         ProductSet result = sample(sampler, 2);
 
         FeatureSet features = FeatureSet.fromDefaultTemplate(2);
@@ -81,7 +83,7 @@ public class DiversitySamplerTest {
     public void shouldYieldALowDiversitySample() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(productLine, 0);
+        DiversitySampler sampler = new DiversitySampler(productLine, ObjectiveFactory.minimiseDiversity(), 1000, new EvolutionListener());
         ProductSet result = sample(sampler, 2);
 
         Diversity diversity = new Diversity();
@@ -92,7 +94,7 @@ public class DiversitySamplerTest {
     public void shouldYieldAHighDiversitySample() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 
-        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        DiversitySampler sampler = new DiversitySampler(productLine, maximiseDiversityAndCoverage(productLine.features()));
         ProductSet result = sample(sampler, 2);
 
         Diversity diversity = new Diversity();
@@ -108,7 +110,7 @@ public class DiversitySamplerTest {
                         feature(3).implies(feature(1)),
                         feature(4).implies(feature(0)));
 
-        DiversitySampler sampler = new DiversitySampler(productLine, 1);
+        DiversitySampler sampler = new DiversitySampler(productLine, maximiseDiversityAndCoverage(productLine.features()));
         ProductSet result = sample(sampler, 4);
 
         System.out.println("Result:\n" + result);

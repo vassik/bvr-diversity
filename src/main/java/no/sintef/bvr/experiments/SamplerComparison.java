@@ -16,6 +16,8 @@ import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.random.RandomSampler;
 import no.sintef.bvr.constraints.LogicalExpression;
 import no.sintef.bvr.sampler.diversity.DiversitySampler;
+import no.sintef.bvr.sampler.diversity.ObjectiveFactory;
+import no.sintef.bvr.sampler.diversity.evolution.Objective;
 
 /**
  *
@@ -96,7 +98,7 @@ public class SamplerComparison {
     }
 
     private static void evaluateGASampling(ProductLine productLine, final PrintStream output, final String productLineName) {
-        DiversitySampler sampler = new DiversitySampler(productLine);
+        DiversitySampler sampler = new DiversitySampler(productLine, ObjectiveFactory.maximiseDiversityAndCoverage(productLine.features()));
         runFor(output, "ga", productLineName, productLine, sampler);
     }
 

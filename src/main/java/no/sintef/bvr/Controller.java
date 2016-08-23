@@ -20,7 +20,9 @@ import no.sintef.bvr.metrics.DistanceMatrix;
 import no.sintef.bvr.metrics.Diversity;
 import no.sintef.bvr.sampler.Sampler;
 import no.sintef.bvr.sampler.diversity.DiversitySampler;
+import static no.sintef.bvr.sampler.diversity.ObjectiveFactory.maximiseDiversityAndCoverage;
 import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
+import no.sintef.bvr.sampler.diversity.evolution.Objective;
 
 public class Controller {
 
@@ -50,8 +52,9 @@ public class Controller {
 
             ProductLine productLine = loadProductLine(pathToProductLine);
             display.productLineLoaded(productLine);
-
-            Sampler sampler = new DiversitySampler(productLine, DESIRED_DIVERSITY, maxEpoch, new SingleThreadedEvolutionReporter(display));
+            
+            final Objective objective = maximiseDiversityAndCoverage(productLine.features());
+            Sampler sampler = new DiversitySampler(productLine, objective, maxEpoch, new SingleThreadedEvolutionReporter(display));
             ProductSet result = sampler.sample(sampleSize);
 
             Diversity diversity = new Diversity();

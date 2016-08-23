@@ -1,9 +1,8 @@
-package no.sintef.bvr.sampler.diversity;
+package no.sintef.bvr.sampler.diversity.evolution;
 
-import no.sintef.bvr.sampler.diversity.evolution.Population;
-import no.sintef.bvr.sampler.diversity.evolution.Individual;
 import java.util.ArrayList;
 import java.util.List;
+import no.sintef.bvr.sampler.diversity.ProductSetIndividual;
 import no.sintef.bvr.spl.Factory;
 import no.sintef.bvr.spl.FeatureSet;
 import org.junit.Test;

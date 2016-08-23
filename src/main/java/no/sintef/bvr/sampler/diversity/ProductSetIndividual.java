@@ -53,7 +53,7 @@ public class ProductSetIndividual extends Individual {
 
     @Override
     public String toString() {
-        return products.toString();
+        return products.toString() + String.format("[F=%.4f]", fitness());
     }
 
 }

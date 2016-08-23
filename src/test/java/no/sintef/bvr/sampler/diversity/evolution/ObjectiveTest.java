@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 public abstract class ObjectiveTest {
 
     private final Objective objective;
-    private final Individual anyCandidate;
+    protected final Individual anyCandidate;
     private final double expectedDistance;
 
     public ObjectiveTest(Objective objective, double expectedDistance) {

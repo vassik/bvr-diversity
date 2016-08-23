@@ -5,7 +5,7 @@ package no.sintef.bvr.sampler.diversity.evolution;
  */
 public abstract class Objective {
 
-    public static double DEFAULT_TOLERANCE = 0.5;
+    public static double DEFAULT_TOLERANCE = 0.01;
 
     public boolean isSatisfiedBy(Individual individual) {
         return isSatisfiedBy(individual, DEFAULT_TOLERANCE);
