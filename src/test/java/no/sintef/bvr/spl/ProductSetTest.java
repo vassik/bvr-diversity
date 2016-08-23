@@ -49,4 +49,51 @@ public class ProductSetTest {
         assertEquals(expectation, extension);
     }
 
+    @Test
+    public void replaceShouldUpdateASingleProduct() {
+        ps1.replace(
+                create.productFromCode(3),
+                create.productFromCode(5));
+
+        assertEquals(ps1, create.productSetFromCodes(1, 2, 5, 4));
+    }
+    
+    @Test
+    public void replaceByAProductThatAlreadyExistShouldReduceTheSizeByOne() {
+        int size = ps1.size();
+        ps1.replace(
+                create.productFromCode(3),
+                create.productFromCode(2));
+
+        assertEquals(size-1, ps1.size());
+    }
+    
+    @Test
+    public void replaceAProductThatDoesNotExistShouldHaveNoEffect() {
+        ps1.replace(
+                create.productFromCode(6),
+                create.productFromCode(8));
+
+        assertEquals(create.productSetFromCodes(1,2,3,4), ps1);
+    }
+    
+    @Test (expected=IllegalArgumentException.class) 
+    public void addShouldRejectNullProducts() {
+        ps1.add(null);
+    }
+
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void replaceShouldRejectNullAsReplacement() {
+        ps1.replace(
+                create.productFromCode(2),
+                null
+        );
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldRejectNullProducts() {
+        new ProductSet(create.productFromCode(1), null);
+    }
+
 }

@@ -1,7 +1,8 @@
 package no.sintef.bvr.spl;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -41,11 +42,11 @@ public class ProductSetEqualityTest {
     }
     
     @Test
-    public void listsShouldDetectWhetherTheyContainAGivenProductSet() {
-        List<ProductSet> list = Arrays.asList(new ProductSet[]{
+    public void setsShouldDetectWhetherTheyContainAGivenProductSet() {
+        Set<ProductSet> list = new HashSet<>(Arrays.asList(new ProductSet[]{
             create.productSetFromCodes(1, 2),
             create.productSetFromCodes(0, 3),
-        });
+        }));
         
         assertTrue(list.contains(create.productSetFromCodes(2, 1)));
     }

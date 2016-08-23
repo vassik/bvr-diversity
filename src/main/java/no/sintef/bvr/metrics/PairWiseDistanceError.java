@@ -1,6 +1,5 @@
 package no.sintef.bvr.metrics;
 
-import no.sintef.bvr.spl.Product;
 import no.sintef.bvr.spl.ProductSet;
 
 /**

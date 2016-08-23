@@ -23,16 +23,16 @@ class CachedProductSet extends ProductSet {
     @Override
     public int size() {
         while (generator.hasNext()) {
-            products.add(generator.next());
+            add(generator.next());
         }
-        return products.size(); 
+        return super.size(); 
     }    
 
     @Override
     public Iterator<Product> iterator() {
         return new Iterator<Product>() {
 
-            private final Iterator<Product> cachedProducts = new ArrayList<>(products).iterator();
+            private final Iterator<Product> cachedProducts = iterator();
 
             @Override
             public boolean hasNext() {
@@ -45,7 +45,7 @@ class CachedProductSet extends ProductSet {
                     return cachedProducts.next();
                 } else if (generator.hasNext()) {
                     final Product newProduct = generator.next();
-                    products.add(newProduct);
+                    add(newProduct);
                     return newProduct;
                 }
                 throw new IllegalStateException("There is no more products");
@@ -56,28 +56,28 @@ class CachedProductSet extends ProductSet {
 
     @Override
     public Product withKey(int key) {
-        if (key < products.size()) {
-            return products.get(key);
+        if (key < super.size()) {
+            return withKey(key);
         }
         while (generator.hasNext()) {
             final Product newProduct = generator.next();
-            products.add(newProduct);
-            if (key < products.size()) {
-                return products.get(key);
+            add(newProduct);
+            if (key < super.size()) {
+                return withKey(key);
             }
         }
-        throw new IllegalArgumentException("No product with index " + key + "(only " + products.size() + " products)");
+        throw new IllegalArgumentException("No product with index " + key + "(only " + super.size() + " products)");
     }
 
     @Override
     public boolean contains(Product product) {
-        if (!products.contains(product)) {
+        if (!super.contains(product)) {
             while (generator.hasNext()) {
                 final Product newProduct = generator.next();
-                products.add(newProduct);
+                add(newProduct);
             }
         }
-        return products.contains(product);
+        return super.contains(product);
     }
 
 }

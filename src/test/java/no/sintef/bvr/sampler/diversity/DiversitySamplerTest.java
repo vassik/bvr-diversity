@@ -36,7 +36,7 @@ public class DiversitySamplerTest {
         return sampler.sample(count);
     }
 
-    //@Ignore
+    @Test
     public void shouldYieldTheCorrectProducts() {
         ConstrainedProductLine productLine = new ConstrainedProductLine(2);
 

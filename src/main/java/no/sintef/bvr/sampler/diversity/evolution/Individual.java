@@ -1,9 +1,5 @@
 package no.sintef.bvr.sampler.diversity.evolution;
 
-import java.util.Objects;
-import no.sintef.bvr.spl.Product;
-import no.sintef.bvr.spl.ProductSet;
-
 /**
  * Individual being evolved by the genetic algorithm.
  */

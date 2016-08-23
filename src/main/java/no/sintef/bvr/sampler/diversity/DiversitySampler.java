@@ -14,7 +14,6 @@ import no.sintef.bvr.sampler.diversity.evolution.Individual;
 public class DiversitySampler implements Sampler {
 
     public static final double DEFAULT_DIVERSITY = 1;
-    private static final int POPULATION_SIZE = 200;
     private static final int MAX_EPOCH = 1000;
 
     private final EvolutionListener listener;
