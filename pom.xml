@@ -70,6 +70,9 @@
                 <configuration>
                     <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
                     <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    <excludes>
+                        <exclude>**/no/sintef/bvr/diversity/*.class</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

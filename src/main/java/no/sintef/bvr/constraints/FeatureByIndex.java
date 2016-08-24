@@ -1,8 +1,5 @@
 package no.sintef.bvr.constraints;
 
-import no.sintef.bvr.spl.Feature;
-import no.sintef.bvr.spl.Product;
-
 public class FeatureByIndex extends LogicalExpression {
 
     private final int featureIndex;

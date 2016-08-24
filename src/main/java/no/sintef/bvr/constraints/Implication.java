@@ -2,7 +2,6 @@
 package no.sintef.bvr.constraints;
 
 import java.util.Objects;
-import no.sintef.bvr.spl.Product;
 
 public class Implication extends LogicalExpression {
 

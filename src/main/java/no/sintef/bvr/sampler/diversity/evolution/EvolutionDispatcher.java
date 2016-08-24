@@ -1,6 +1,5 @@
 package no.sintef.bvr.sampler.diversity.evolution;
 
-import no.sintef.bvr.sampler.diversity.evolution.EvolutionListener;
 import java.util.LinkedList;
 import java.util.List;
 

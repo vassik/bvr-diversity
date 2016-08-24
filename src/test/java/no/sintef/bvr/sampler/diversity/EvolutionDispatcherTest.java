@@ -14,11 +14,11 @@ import org.mockito.Matchers;
 /**
  * Specification of the EvolutionDispatcher
  */
-public class EvolutionDispatcherTests {
+public class EvolutionDispatcherTest {
 
     private final EvolutionDispatcher dispatcher;
 
-    public EvolutionDispatcherTests() {
+    public EvolutionDispatcherTest() {
         dispatcher = new EvolutionDispatcher();
     }
 

@@ -34,11 +34,6 @@ public class Product {
         }
     }
 
-    public Product(BitSet isActive) {
-        this.features = FeatureSet.fromTemplate(isActive.length(), "f%d");
-        this.isActive = (BitSet) isActive.clone();
-    }
-
     private Product(Product source) {
         this.features = source.features;
         this.isActive = (BitSet) source.isActive.clone();

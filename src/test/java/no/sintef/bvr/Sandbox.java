@@ -14,11 +14,6 @@ import org.sat4j.specs.TimeoutException;
  */
 public class Sandbox {
 
-    @Test
-    public void sandbox() {
-        Controller controller = new Controller();
-        controller.execute(new String[]{"gen_pl_10.txt", "4", "10000"});
-    }
 
     @Test
     public void testSat4j() throws TimeoutException, ContradictionException {

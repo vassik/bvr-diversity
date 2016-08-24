@@ -2,8 +2,6 @@
 package no.sintef.bvr.constraints;
 
 import java.util.Objects;
-import no.sintef.bvr.spl.Feature;
-import no.sintef.bvr.spl.Product;
 
 
 public class FeatureByName extends LogicalExpression {
