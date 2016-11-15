@@ -67,7 +67,7 @@ public class TheIndividualFactory implements EvolutionFactory {
 
     @Override
     public Crossover aRandomCrossover() {
-        return new SinglePointCrossover(productLine.features().count() / 2);
+        return new SinglePointCrossover(sampleSize / 2);
     }
 
 }

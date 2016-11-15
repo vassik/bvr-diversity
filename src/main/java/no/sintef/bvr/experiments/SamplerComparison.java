@@ -39,6 +39,10 @@ import no.sintef.bvr.sampler.diversity.ObjectiveFactory;
 public class SamplerComparison {
 
     public static void main(String args[]) throws FileNotFoundException {
+        System.out.println("BVR Diversity Sampler v" + SamplerComparison.class.getPackage().getImplementationVersion());
+        System.out.println("Copyright (C) 2016 -- SINTEF ICT");
+        System.out.println("");
+        
         final FeatureSet features = FeatureSet.fromTemplate(3, "f%d");
 
         // Small and Open
@@ -88,6 +92,8 @@ public class SamplerComparison {
             evaluateRandomSampling(pl_4, output, "pl_4");
             evaluateGASampling(pl_4, output, "pl_4");
         }
+        
+        System.out.println("\nResults stored in 'results.csv'.");
 
     }
 
