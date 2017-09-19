@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'ubuntu' }
+        docker { image 'maven' }
     }
     stages {
         stage('Test') {
