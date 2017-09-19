@@ -36,7 +36,7 @@ public class DistanceMatrixFormatterTest {
                         ;
                 
         assertEquals(output.toString(), expected, output.toString());
-        assertFalse(True);
+        assertFalse(true);
     }
 
 }
