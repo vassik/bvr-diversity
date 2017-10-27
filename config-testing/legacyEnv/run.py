@@ -46,12 +46,12 @@ def copy_dir_contents(src, dst, symlinks=False, ignore=None):
 			shutil.copy2(s, d)
 
 
-def print_job_std(job, stdout, stderr):
+def print_job_std(stdout, stderr):
 	for line in StringIO.StringIO(stdout).readlines():
-		print '[STDOUT ' + job + '] ' + line.rstrip()
+		print '[STDOUT] ' + line.rstrip()
 
 	for line in StringIO.StringIO(stderr).readlines():
-		print '[STDERR ' + job + '] ' + line.rstrip()
+		print '[STDERR] ' + line.rstrip()
 
 
 def check_and_print_sdt(stdout, stderr):
@@ -96,7 +96,7 @@ def get_master_ip_address():
 	return master_ip
 
 
-def execute_tests(jobs, **slave_params):
+def execute_tests(**slave_params):
 	script = slave_params.get('script')
 	master_job_root = slave_params.get('master_job_root')
 	master_ip = slave_params.get('master_ip')
@@ -106,47 +106,36 @@ def execute_tests(jobs, **slave_params):
 	docker_worker_image = slave_params.get('docker_worker_image')
 	processes = {}
 
-	#run all testing
-	for job in jobs:
-		#docker run --rm vassik/thingml-test-worker:v0.1 ./dojob.py /master/ job1 172.17.0.6 22 thmlslave thmlslave
-		command = ['docker', 'run', '--rm', docker_worker_image, script, master_job_root,
-			job, master_ip, master_ssh_port, master_user, master_pass]
-		print 'Executing: ' + ' '.join(command)
-		processes[job] = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	
+	#docker run --rm vassik/thingml-test-worker:v0.1 ./dojob.py /master/ 172.17.0.6 22 thmlslave thmlslave
+	command = ['docker', 'run', '--rm', docker_worker_image, script, master_job_root,
+		master_ip, master_ssh_port, master_user, master_pass]
+	print 'Executing: ' + ' '.join(command)
+	process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 	#wait for all jobs to complete
-	for job in jobs:
-		stdout, stderr = processes.get(job).communicate()
-		print_job_std(job, stdout, stderr)
+	stdout, stderr = process.communicate()
+	print_job_std(stdout, stderr)
 
 
-def prepare_report(working_folder, jobs, report_folder, category_name):
+def prepare_report(working_folder,report_folder, category_name):
 	#we expect archive with results in tmp.tar
 	header_accumulated_result = ''
 	body_accumulated_result = ''
 	footer_accumulated_result = ''
 	category_report_folder = os.path.join(report_folder, category_name)
 	os.mkdir(category_report_folder)
-	for job in jobs:
-		job_folder = os.path.join(working_folder, job)
-		result_job_arch_file = os.path.join(job_folder, "tmp.tar")
-		if not os.path.isfile(result_job_arch_file):
-			print "Cannot find file with results for the '" + job + "' routine (this job probably failed). Skipping..."
-			continue
 
-		command= ['tar', '-xf', 'tmp.tar']
-		print "Executing: '" + ' '.join(command) + "' in " + job_folder
-		proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=job_folder)
-		stderr, stdout = proc.communicate()
-		check_and_print_sdt(stdout, stderr)
 
-		#copying content of the job result folder to the folder that accumulates results for the entity category
-		result_job_folder = os.path.join(job_folder, 'tmp')
-		result_job_report_folder = os.path.join(category_report_folder, job)
-		os.mkdir(result_job_report_folder)
-		copy_dir_contents(result_job_folder, result_job_report_folder)
+	command= ['tar', '-xf', 'tmp.tar']
+	print "Executing: '" + ' '.join(command) + "' in " + working_folder
+	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_folder)
+	stderr, stdout = proc.communicate()
+	check_and_print_sdt(stdout, stderr)
 
-	
+	#copying content of the job result folder to the folder that accumulates results for the entity category
+	copy_dir_contents(os.path.join(working_folder, 'tmp'), category_report_folder)
+
 
 def run_routine(category_name, working_folder, report_folder, master_slave_user, master_slave_pwd, master_ssh_port, sut_folder):
 	config = ConfigParser.ConfigParser()
@@ -165,13 +154,10 @@ def run_routine(category_name, working_folder, report_folder, master_slave_user,
 		'master_ip' : master_ip, 'master_ssh_port': master_ssh_port , 'master_user' : master_slave_user,
 		'master_pass' : master_slave_pwd, 'docker_worker_image' : docker_image_name}
 
-	jobs = ['job1']
-	for job in jobs:
-		os.mkdir(os.path.join(working_folder, job))
 
 	build_docker_image(dockerfile_path, docker_image_name, sut_folder)
-	execute_tests(jobs, **slave_params)
-	prepare_report(working_folder, jobs, report_folder, category_name)
+	execute_tests(**slave_params)
+	prepare_report(working_folder, report_folder, category_name)
 
 
 if __name__ == "__main__":

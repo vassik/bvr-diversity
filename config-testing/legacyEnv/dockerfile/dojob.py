@@ -26,11 +26,11 @@ import shutil
 def stderrprint(error):
 	sys.stderr.write(error)
 
-def print_success(job_name):
-	print "SUCCESS: " + job_name
+def print_success():
+	print "SUCCESS"
 
-def print_failure(job_name):
-	print "FAILURE: " + job_name
+def print_failure():
+	print "FAILURE"
 
 def check_and_print_std(stdout, stderr):
 	for line in StringIO.StringIO(stdout).readlines():
@@ -43,7 +43,7 @@ def check_and_print_std(stdout, stderr):
 		return 1
 	return 0
 
-def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pass, job_name, master_workspace):
+def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pass, master_workspace):
 
 	#execute test cases
 	command = ["mvn", "clean", "install"]
@@ -56,7 +56,7 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 	stdout, stderr = proc.communicate()
 
 	if check_and_print_std(stdout, stderr):
-		print_failure(job_name)
+		print_failure()
 		return
 
 	#moving some files to tmp dir
@@ -67,7 +67,7 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 	stdout, stderr = proc.communicate()
 
 	if check_and_print_std(stdout, stderr):
-		print_failure(job_name)
+		print_failure()
 		return
 
 	#archiving
@@ -77,12 +77,11 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 	stdout, stderr = proc.communicate()
 
 	if check_and_print_std(stdout, stderr):
-		print_failure(job_name)
+		print_failure()
 		return
 
 	#send results back to master
-	master_job_folder = os.path.join(master_workspace, job_name)
-	master_tmp_arch_file = os.path.join(master_job_folder, "tmp.tar")
+	master_tmp_arch_file = os.path.join(master_workspace, "tmp.tar")
 	command = ["sshpass", "-p", master_ssh_pass, "scp", "-o", "LogLevel=error", "-o", "UserKnownHostsFile=/dev/null", "-o", "ConnectTimeout=30", "-o", 
 		"StrictHostKeyChecking=no", "-P", master_ssh_port, "./tmp.tar", 
 		master_ssh_user + "@" + master_host_ip + ":\"" + master_tmp_arch_file + "\""]
@@ -93,23 +92,22 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 	stdout, stderr = proc.communicate()
 
 	if check_and_print_std(stdout, stderr):
-		print_failure(job_name)
+		print_failure()
 		return
 
-	print_success(job_name)
+	print_success()
 	return
 
 
 if __name__ == "__main__":
-	if len(sys.argv) < 7:
-		print "./dojob.py <master_workspace> <job_name> <master_host_ip> <master_ssh_port> <master_ssh_user> <master_ssh_pass>"
+	if len(sys.argv) < 6:
+		print "Not executed! ./dojob.py <master_workspace> <master_host_ip> <master_ssh_port> <master_ssh_user> <master_ssh_pass>"
 		sys.exit(1)
 
 	master_workspace = sys.argv[1]
-	slave_job_name = sys.argv[2]
-	master_host_ip = sys.argv[3]
-	master_ssh_port = sys.argv[4]
-	master_ssh_user = sys.argv[5]
-	master_ssh_pass = sys.argv[6]
+	master_host_ip = sys.argv[2]
+	master_ssh_port = sys.argv[3]
+	master_ssh_user = sys.argv[4]
+	master_ssh_pass = sys.argv[5]
 
-	run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pass, slave_job_name, master_workspace)
+	run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pass, master_workspace)
