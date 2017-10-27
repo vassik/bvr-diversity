@@ -74,8 +74,11 @@ def check_and_print_sdt(stdout, stderr):
 
 def build_docker_image(dockerfile_path, docker_image_name, sut_folder):
 	dockerfile_abs = os.path.join(SCRIPT_ABSOLUTE_PATH, dockerfile_path)
+
 	print "Copying SUT from " + sut_folder
-	shutil.copytree(sut_folder, dockerfile_abs)
+	ignore_config_testing = lambda directory, contents: ['config-testing'] if os.path.isdir(os.path.join(directory, 'config-testing')) and 'config-testing' in contents else []
+	shutil.copytree(sut_folder, dockerfile_abs + "/bvr-diversity", symlinks=False, ignore=ignore_config_testing)
+	
 	command = ['docker', 'build', '--rm', '-t', docker_image_name, '.']
 	print 'Building image: ' + ' '.join(command) + ' in ' + dockerfile_abs
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=dockerfile_abs)
@@ -161,9 +164,9 @@ def prepare_report(working_folder, jobs, report_folder, category_name):
 		copy_dir_contents(result_job_folder, result_job_report_folder)
 
 		#copy src directory
-		src_result_job_report_folder = os.path.join(result_job_report_folder, 'src')
-		os.mkdir(src_result_job_report_folder)
-		copy_dir_contents(os.path.join(job_folder, 'src'), src_result_job_report_folder)
+		#src_result_job_report_folder = os.path.join(result_job_report_folder, 'src')
+		#os.mkdir(src_result_job_report_folder)
+		#copy_dir_contents(os.path.join(job_folder, 'src'), src_result_job_report_folder)
 
 		job_body = ""
 		with open(os.path.join(result_job_folder, 'results.html'), 'r') as file:
@@ -223,6 +226,8 @@ def run_routine(category_name, working_folder, report_folder, master_slave_user,
 		'master_pass' : master_slave_pwd, 'docker_worker_image' : docker_image_name}
 
 	jobs = ['job1']
+	for job in jobs:
+		os.mkdir(os.path.join(working_folder, job))
 
 	build_docker_image(dockerfile_path, docker_image_name, sut_folder)
 	execute_tests(jobs, **slave_params)

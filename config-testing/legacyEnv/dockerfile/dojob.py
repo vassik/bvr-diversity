@@ -20,6 +20,7 @@ import os
 import sys
 import subprocess
 import StringIO
+import shutil
 
 
 def stderrprint(error):
@@ -59,12 +60,18 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 		return
 
 	#moving some files to tmp dir
-	command = ["mv", "./bvr-diversity/target", "./bvr-diversity/tmp", "&&", "touch", "./bvr-diversity/tmp/results.html"]
+	shutil.copytree("./bvr-diversity/target", "./tmp")
+	command = ["touch", "./tmp/results.html"]
 	print "Executing: " + " ".join(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	stdout, stderr = proc.communicate()
+
+	if check_and_print_std(stdout, stderr):
+		print_failure(job_name)
+		return
 
 	#archiving
-	command = ["tar", "-cf", "tmp.tar", "./bvr-diversity/tmp"]
+	command = ["tar", "-cf", "tmp.tar", "./tmp"]
 	print "Executing: " + " ".join(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	stdout, stderr = proc.communicate()
@@ -74,6 +81,7 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 		return
 
 	#send results back to master
+	master_job_folder = os.path.join(master_workspace, job_name)
 	master_tmp_arch_file = os.path.join(master_job_folder, "tmp.tar")
 	command = ["sshpass", "-p", master_ssh_pass, "scp", "-o", "LogLevel=error", "-o", "UserKnownHostsFile=/dev/null", "-o", "ConnectTimeout=30", "-o", 
 		"StrictHostKeyChecking=no", "-P", master_ssh_port, "./tmp.tar", 
