@@ -35,15 +35,6 @@ SETTING_DOKCERFILE_PATH = 'docker_image_dir'
 SETTING_IMAGE_NAME = 'docker_image_name'
 
 
-def get_thingml_pom_version(pom_xml_file):
-	print "Retrieving ThingML version from: " + pom_xml_file
-	pom_xml = ET.parse(pom_xml_file)
-	root = pom_xml.getroot()
-	m = re.match('\{.*\}', root.tag)
-	ns = m.group(0) if m else ''
-	version = root.find(ns + 'version')
-	print "ThingML version: " + version.text
-	return version.text
 
 def copy_dir_contents(src, dst, symlinks=False, ignore=None):
 	for item in os.listdir(src):
@@ -128,14 +119,6 @@ def execute_tests(jobs, **slave_params):
 		stdout, stderr = processes.get(job).communicate()
 		print_job_std(job, stdout, stderr)
 
-def get_header_footer_path(category_report_folder, jobs, header_footer_name):
-	for job in jobs:
-		report_job_folder = os.path.join(category_report_folder, job)
-		header_path = os.path.join(report_job_folder, header_footer_name)
-		if os.path.isfile(header_path):
-			return header_path
-	return ""
-
 
 def prepare_report(working_folder, jobs, report_folder, category_name):
 	#we expect archive with results in tmp.tar
@@ -163,49 +146,6 @@ def prepare_report(working_folder, jobs, report_folder, category_name):
 		os.mkdir(result_job_report_folder)
 		copy_dir_contents(result_job_folder, result_job_report_folder)
 
-		#copy src directory
-		#src_result_job_report_folder = os.path.join(result_job_report_folder, 'src')
-		#os.mkdir(src_result_job_report_folder)
-		#copy_dir_contents(os.path.join(job_folder, 'src'), src_result_job_report_folder)
-
-		job_body = ""
-		with open(os.path.join(result_job_folder, 'results.html'), 'r') as file:
-			job_body = file.read()
-
-		#modify urls, job name should precede all urls
-		pattern = '(?<=href=\").+(?=\")'
-		matches = re.findall(pattern, job_body)
-		for old_path in matches:
-			new_path = os.path.join(job, old_path.lstrip('/'))
-			job_body = job_body.replace(old_path, new_path)
-
-		body_accumulated_result = body_accumulated_result + job_body
-
-	#footer and header should be in any of job folder, take the one we find first
-	header_path = get_header_footer_path(category_report_folder, jobs, "header.html")
-	footer_path = get_header_footer_path(category_report_folder, jobs, "footer.html")
-	if header_path:
-		with open(header_path, 'r') as file:
-			header_accumulated_result = file.read()
-
-	if footer_path:
-		with open(footer_path, 'r') as file:
-			footer_accumulated_result = file.read()
-
-	#copy js and stuff for report and fix the link
-	listjs_name = 'listjs.js'
-	report_templ_dir = os.path.join(SCRIPT_ABSOLUTE_PATH, 'report_templates')
-	listjs = os.path.join(report_templ_dir, listjs_name)
-	shutil.copy2(listjs, os.path.join(category_report_folder, listjs_name))
-
-	match = re.search("(?<=src=\").+(?=\")", footer_accumulated_result)
-	if match:
-		old_path = match.group(0)
-		footer_accumulated_result = footer_accumulated_result.replace(old_path, listjs_name)
-
-	final_results_path = os.path.join(category_report_folder, 'results.html')
-	with open(final_results_path, 'w') as file:
-		file.write(header_accumulated_result + body_accumulated_result + footer_accumulated_result)
 	
 
 def run_routine(category_name, working_folder, report_folder, master_slave_user, master_slave_pwd, master_ssh_port, sut_folder):
