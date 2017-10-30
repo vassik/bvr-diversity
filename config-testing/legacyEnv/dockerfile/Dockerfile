@@ -29,7 +29,8 @@ RUN mkdir workingdir \
 	make \
 	nodejs \
 	npm \
-	ant
+	ant \
+	ant-optional
 
 #copy everything
 COPY . workingdir/
