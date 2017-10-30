@@ -4,14 +4,14 @@
         </description>
 
         <target name="gen">
-                <property name="genReportDir" location="${basedir}/unitTestReports"/>
+                <property name="genReportDir" location="${basedir}/tmp"/>
                 <delete dir="${genReportDir}"/>
                 <mkdir dir="${genReportDir}"/>
-                <junitreport todir="${basedir}/unitTestReports">
+                <junitreport todir="${basedir}/tmp">
                         <fileset dir="${basedir}">
-                                <include name="**/job1/surefire-reports/TEST-*.xml"/>
+                                <include name="**/bvr-diversity/target/surefire-reports/TEST-*.xml"/>
                         </fileset>
-                        <report format="frames" todir="${genReportDir}/html"/>
+                        <report format="frames" todir="${genReportDir}"/>
                 </junitreport>
         </target>
 </project>

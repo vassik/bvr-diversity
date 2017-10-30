@@ -59,12 +59,27 @@ def run_routine(master_host_ip, master_ssh_port, master_ssh_user, master_ssh_pas
 		print_failure()
 		return
 
-	#moving some files to tmp dir
-	shutil.copytree("./bvr-diversity/target", "./tmp")
-	command = ["touch", "./tmp/results.html"]
+	#generate report in html
+	command = ["ant", "-buildfile", "buildHTMLReportAnt.xml"]
 	print "Executing: " + " ".join(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	stdout, stderr = proc.communicate()
+
+	if check_and_print_std(stdout, stderr):
+		print_failure()
+		return
+
+	#moving some files to tmp dir
+	#shutil.copytree("./bvr-diversity/target", "./tmp")
+	#command = ["touch", "./tmp/results.html"]
+	#print "Executing: " + " ".join(command)
+	#proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	#stdout, stderr = proc.communicate()
+
+	command = ["mv", "./tmp/index.html", "./tmp/results.html"]
+	print "Executing: " + " ".join(command)
+	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	stdout, stderr = proc.communicate()	
 
 	if check_and_print_std(stdout, stderr):
 		print_failure()
